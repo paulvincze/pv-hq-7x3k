@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Business HQ</title>
+<style>
+  html,body{margin:0;padding:0;background:#080B12;min-height:100vh;-webkit-font-smoothing:antialiased;}
+  #boot{position:fixed;inset:0;display:grid;place-items:center;color:#9AA3B5;font-family:-apple-system,system-ui,sans-serif;z-index:1;}
+  #err{display:none;position:fixed;inset:0;padding:32px;color:#E0726B;font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;overflow:auto;background:#080B12;z-index:99;}
+</style>
+</head>
+<body>
+<div id="boot">Opening your HQ&hellip;</div>
+<div id="err"></div>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script>
+  // if libraries fail to load (e.g. no internet on first open), tell the user plainly
+  setTimeout(function(){
+    if(!(window.React && window.ReactDOM && window.Babel)){
+      var b=document.getElementById('boot');
+      if(b) b.innerHTML='<div style="text-align:center;max-width:340px;line-height:1.6"><b style="color:#D8B45A">Couldn\'t load.</b><br>This app needs an internet connection the first time you open it. Connect to Wi-Fi and refresh this page (Ctrl/Cmd + R).</div>';
+    }
+  }, 7000);
+  window.addEventListener('error', function(e){
+    var el=document.getElementById('err');
+    var bt=document.getElementById('boot');
+    if(bt) bt.style.display='none';
+    if(el){ el.style.display='block'; el.textContent='Something went wrong:\n\n'+(e.message||e.error||e)+'\n\n'+((e.error&&e.error.stack)||''); }
+  });
+</script>
+<script type="text/babel" data-presets="react" data-react-runtime="classic">
+try {
+const {useState,useEffect,useMemo,useRef}=React;
+function __mk(p){ return function(a){ a=a||{}; var s=a.size||18; return React.createElement('svg',{width:s,height:s,viewBox:'0 0 24 24',fill:a.fill||'none',stroke:a.color||'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round',style:a.style,dangerouslySetInnerHTML:{__html:p}}); }; }
+const I_LayoutDashboard = __mk(`<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>`);
+const I_Users = __mk(`<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`);
+const I_GitBranch = __mk(`<line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>`);
+const I_Wallet = __mk(`<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>`);
+const I_Tag = __mk(`<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>`);
+const I_Clapperboard = __mk(`<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9M12.4 3.4l3.1 4M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>`);
+const I_TrendingUp = __mk(`<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>`);
+const I_Building2 = __mk(`<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/>`);
+const I_Database = __mk(`<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>`);
+const I_Plus = __mk(`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`);
+const I_Pencil = __mk(`<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>`);
+const I_Trash2 = __mk(`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>`);
+const I_X = __mk(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`);
+const I_Check = __mk(`<polyline points="20 6 9 17 4 12"/>`);
+const I_ChevronRight = __mk(`<polyline points="9 18 15 12 9 6"/>`);
+const I_Target = __mk(`<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`);
+const I_Download = __mk(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`);
+const I_Upload = __mk(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>`);
+const I_Calendar = __mk(`<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>`);
+const I_Lightbulb = __mk(`<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2Z"/>`);
+const I_Flame = __mk(`<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>`);
+const I_CheckCircle2 = __mk(`<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`);
+const I_Circle = __mk(`<circle cx="12" cy="12" r="10"/>`);
+const I_Star = __mk(`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`);
+const I_Youtube = __mk(`<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>`);
+const I_Instagram = __mk(`<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>`);
+const I_Menu = __mk(`<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>`);
+const I_Wifi = __mk(`<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>`);
+const I_Briefcase = __mk(`<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>`);
+const I_AlertCircle = __mk(`<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`);
+const I_Sparkles = __mk(`<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>`);
+const I_RotateCcw = __mk(`<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>`);
+const I_Receipt = __mk(`<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8M8 11h8M8 15h5"/>`);
+const I_Rocket = __mk(`<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>`);
+const I_Camera = __mk(`<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>`);
+const I_Film = __mk(`<rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>`);
+const I_Megaphone = __mk(`<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>`);
+const I_Copy = __mk(`<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`);
+const I_Zap = __mk(`<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`);
+const I_Heart = __mk(`<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>`);
+const I_DollarSign = __mk(`<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>`);
+const I_BarChart3 = __mk(`<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>`);
+const I_Gift = __mk(`<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`);
+const I_Trophy = __mk(`<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>`);
+const I_Layers = __mk(`<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>`);
+const I_Globe = __mk(`<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>`);
+const I_Book = __mk(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`);
+
+function SvgBar({ data, dataKey, color }) {
+  const w = 520, h = 220, padL = 38, padB = 26, padT = 10, padR = 10;
+  const vals = data.map(d => +d[dataKey] || 0);
+  const max = Math.max(1, ...vals);
+  const iw = w - padL - padR, ih = h - padT - padB;
+  const bw = data.length ? iw / data.length : iw;
+  const ticks = 4;
+  return React.createElement('div', { style: { width: '100%', height: '100%' } },
+    React.createElement('svg', { viewBox: `0 0 ${w} ${h}`, width: '100%', height: '100%', preserveAspectRatio: 'none' },
+      [...Array(ticks + 1)].map((_, i) => {
+        const y = padT + (ih / ticks) * i;
+        const v = Math.round(max - (max / ticks) * i);
+        return React.createElement('g', { key: 'g' + i },
+          React.createElement('line', { x1: padL, y1: y, x2: w - padR, y2: y, stroke: T.line, strokeDasharray: '3 3' }),
+          React.createElement('text', { x: padL - 6, y: y + 3, fill: T.mut, fontSize: 10, textAnchor: 'end' }, v)
+        );
+      }),
+      data.map((d, i) => {
+        const v = +d[dataKey] || 0;
+        const bh = (v / max) * ih;
+        const x = padL + bw * i + bw * 0.2;
+        const bwid = bw * 0.6;
+        const y = padT + ih - bh;
+        return React.createElement('g', { key: 'b' + i },
+          React.createElement('rect', { x, y, width: bwid, height: Math.max(0, bh), rx: 5, fill: color }),
+          React.createElement('text', { x: x + bwid / 2, y: h - 8, fill: T.mut, fontSize: 10, textAnchor: 'middle' }, d.name)
+        );
+      })
+    )
+  );
+}
+
+function SvgArea({ data, dataKey, color }) {
+  const w = 520, h = 180, padL = 38, padB = 26, padT = 10, padR = 10;
+  const vals = data.map(d => +d[dataKey] || 0);
+  const max = Math.max(1, ...vals);
+  const iw = w - padL - padR, ih = h - padT - padB;
+  const pts = data.map((d, i) => {
+    const x = padL + (data.length > 1 ? (iw / (data.length - 1)) * i : iw / 2);
+    const y = padT + ih - ((+d[dataKey] || 0) / max) * ih;
+    return [x, y];
+  });
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ');
+  const area = pts.length ? line + ` L ${pts[pts.length - 1][0]} ${padT + ih} L ${pts[0][0]} ${padT + ih} Z` : '';
+  const ticks = 4;
+  return React.createElement('div', { style: { width: '100%', height: '100%' } },
+    React.createElement('svg', { viewBox: `0 0 ${w} ${h}`, width: '100%', height: '100%', preserveAspectRatio: 'none' },
+      React.createElement('defs', null,
+        React.createElement('linearGradient', { id: 'areaGrad', x1: '0', y1: '0', x2: '0', y2: '1' },
+          React.createElement('stop', { offset: '0%', stopColor: color, stopOpacity: 0.35 }),
+          React.createElement('stop', { offset: '100%', stopColor: color, stopOpacity: 0 })
+        )
+      ),
+      [...Array(ticks + 1)].map((_, i) => {
+        const y = padT + (ih / ticks) * i;
+        const v = Math.round(max - (max / ticks) * i);
+        return React.createElement('g', { key: 'g' + i },
+          React.createElement('line', { x1: padL, y1: y, x2: w - padR, y2: y, stroke: T.line, strokeDasharray: '3 3' }),
+          React.createElement('text', { x: padL - 6, y: y + 3, fill: T.mut, fontSize: 10, textAnchor: 'end' }, v)
+        );
+      }),
+      area && React.createElement('path', { d: area, fill: 'url(#areaGrad)' }),
+      React.createElement('path', { d: line, fill: 'none', stroke: color, strokeWidth: 2 }),
+      data.map((d, i) => React.createElement('text', { key: 't' + i, x: pts[i][0], y: h - 8, fill: T.mut, fontSize: 10, textAnchor: 'middle' }, d.name))
+    )
+  );
+}
+
+function SvgLines({ data, series }) {
+  const w = 520, h = 230, padL = 40, padB = 26, padT = 10, padR = 10;
+  const all = [];
+  data.forEach(d => series.forEach(s => all.push(+d[s.key] || 0)));
+  const max = Math.max(1, ...all);
+  const iw = w - padL - padR, ih = h - padT - padB;
+  const ticks = 4;
+  const xFor = (i) => padL + (data.length > 1 ? (iw / (data.length - 1)) * i : iw / 2);
+  const yFor = (v) => padT + ih - ((+v || 0) / max) * ih;
+  return React.createElement('div', { style: { width: '100%', height: '100%' } },
+    React.createElement('svg', { viewBox: `0 0 ${w} ${h}`, width: '100%', height: '100%', preserveAspectRatio: 'none' },
+      [...Array(ticks + 1)].map((_, i) => {
+        const y = padT + (ih / ticks) * i;
+        const v = Math.round(max - (max / ticks) * i);
+        return React.createElement('g', { key: 'g' + i },
+          React.createElement('line', { x1: padL, y1: y, x2: w - padR, y2: y, stroke: T.line, strokeDasharray: '3 3' }),
+          React.createElement('text', { x: padL - 6, y: y + 3, fill: T.mut, fontSize: 10, textAnchor: 'end' }, v)
+        );
+      }),
+      series.map((s, si) => {
+        const line = data.map((d, i) => (i ? 'L' : 'M') + xFor(i) + ' ' + yFor(d[s.key])).join(' ');
+        return React.createElement('g', { key: 's' + si },
+          React.createElement('path', { d: line, fill: 'none', stroke: s.color, strokeWidth: 2.5 }),
+          data.map((d, i) => React.createElement('circle', { key: 'c' + i, cx: xFor(i), cy: yFor(d[s.key]), r: 3, fill: s.color }))
+        );
+      }),
+      data.map((d, i) => React.createElement('text', { key: 't' + i, x: xFor(i), y: h - 8, fill: T.mut, fontSize: 10, textAnchor: 'middle' }, d.name))
+    )
+  );
+}
+
+function SvgDonut({ data }) {
+  const total = data.reduce((a, b) => a + (b.value || 0), 0) || 1;
+  const cx = 90, cy = 90, r = 64, sw = 26;
+  let acc = 0;
+  const circ = 2 * Math.PI * r;
+  return React.createElement('div', { style: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+    React.createElement('svg', { viewBox: '0 0 180 180', width: 180, height: 180 },
+      React.createElement('circle', { cx, cy, r, fill: 'none', stroke: T.line, strokeWidth: sw }),
+      data.map((d, i) => {
+        const frac = (d.value || 0) / total;
+        const dash = frac * circ;
+        const gap = circ - dash;
+        const offset = -acc * circ;
+        acc += frac;
+        return React.createElement('circle', {
+          key: i, cx, cy, r, fill: 'none', stroke: d.fill, strokeWidth: sw,
+          strokeDasharray: `${dash} ${gap}`, strokeDashoffset: offset,
+          transform: `rotate(-90 ${cx} ${cy})`
+        });
+      })
+    )
+  );
+}
+
+/* ============================ Business HQ v2 — body ============================ */
+/* Globals injected by host: React, hooks, icon components (I_*), SVG charts. */
+
+/* ---------- persistence with migration (keeps your existing data) ---------- */
+const KEY = "hq:state:v1";
+const lsOK = (() => { try { const k = "__t"; localStorage.setItem(k, "1"); localStorage.removeItem(k); return true; } catch (e) { return false; } })();
+const mem = {};
+const store = (typeof window !== "undefined" && window.storage) ? window.storage
+  : lsOK ? {
+      get: async (k) => { const v = localStorage.getItem(k); return v == null ? null : { value: v }; },
+      set: async (k, v) => { localStorage.setItem(k, v); return { value: v }; },
+    } : {
+      get: async (k) => (k in mem ? { value: mem[k] } : null),
+      set: async (k, v) => { mem[k] = v; return { value: v }; },
+    };
+
+/* deep-merge defaults into saved state: keeps your records, adds any new fields/pages */
+function migrate(saved, def) {
+  if (saved == null) return JSON.parse(JSON.stringify(def));
+  const out = Array.isArray(def) ? (Array.isArray(saved) ? saved : def) : {};
+  if (!Array.isArray(def)) {
+    const keys = new Set([...Object.keys(def), ...Object.keys(saved || {})]);
+    keys.forEach((k) => {
+      const dv = def[k], sv = saved ? saved[k] : undefined;
+      if (sv === undefined) out[k] = dv;
+      else if (dv && typeof dv === "object" && !Array.isArray(dv)) out[k] = migrate(sv, dv);
+      else out[k] = sv; // arrays & primitives: keep yours
+    });
+    return out;
+  }
+  return out;
+}
+
+/* ---------- helpers ---------- */
+const uid = () => Math.random().toString(36).slice(2, 9);
+const ron = (n) => (n || n === 0 ? Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 }) : "0");
+const monthKey = (iso) => (iso ? iso.slice(0, 7) : "");
+const thisMonth = () => new Date().toISOString().slice(0, 7);
+const lastMonth = () => { const d = new Date(); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0, 7); };
+const niceMonth = (k) => { if (!k) return ""; const [y, m] = k.split("-"); return new Date(y, m - 1, 1).toLocaleString("en-US", { month: "short", year: "2-digit" }); };
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* ---------- icon registry (editable picks reference these keys) ---------- */
+const ICONS = {
+  dashboard: I_LayoutDashboard, users: I_Users, pipeline: I_GitBranch, wallet: I_Wallet,
+  tag: I_Tag, content: I_Clapperboard, growth: I_TrendingUp, building: I_Building2,
+  database: I_Database, target: I_Target, flame: I_Flame, star: I_Star, book: I_Book,
+  receipt: I_Receipt, calendar: I_Calendar, lightbulb: I_Lightbulb, rocket: I_Rocket,
+  camera: I_Camera, film: I_Film, megaphone: I_Megaphone, check: I_CheckCircle2,
+  bolt: I_Zap, heart: I_Heart, dollar: I_DollarSign, chart: I_BarChart3, gift: I_Gift,
+  briefcase: I_Briefcase, youtube: I_Youtube, instagram: I_Instagram, sparkles: I_Sparkles,
+  trophy: I_Trophy, pencil: I_Pencil, layers: I_Layers, globe: I_Globe,
+};
+const ICON_KEYS = Object.keys(ICONS);
+function Icon({ name, ...p }) { const Cmp = ICONS[name] || I_Circle; return <Cmp {...p} />; }
+
+/* ---------- color palette presets ---------- */
+const PRESET_ACCENTS = ["#D8B45A", "#5B9BD5", "#4FB477", "#C77DBB", "#E0875E", "#7C83FB", "#E0556E", "#3FB6B0"];
+
+/* ============================ DEFAULT STATE ============================ */
+const DEFAULT = {
+  meta: { version: 2 },
+  settings: {
+    name: "Paul Vincze", goalRON: 9000, igGoal: 100000, ytGoal: 100000,
+    accent: "#D8B45A", glass: true, currency: "RON",
+    nextMoveTitle: "Close Hammoudi on a retainer",
+    nextMoveText: "Direct client, has money, recurring by nature. One retainer changes your whole month. The offer is written and waiting in your messages.",
+  },
+  nav: [
+    { key: "dash", label: "Dashboard", icon: "dashboard" },
+    { key: "clients", label: "Clients", icon: "users" },
+    { key: "pipeline", label: "Pipeline", icon: "pipeline" },
+    { key: "income", label: "Income", icon: "wallet" },
+    { key: "expenses", label: "Expenses", icon: "receipt" },
+    { key: "pricing", label: "Pricing", icon: "tag" },
+    { key: "content", label: "Content Engine", icon: "content" },
+    { key: "growth", label: "Growth", icon: "growth" },
+    { key: "goals", label: "Goals", icon: "target" },
+    { key: "playbook", label: "Playbook", icon: "book" },
+    { key: "sky", label: "Skyscraper", icon: "building" },
+    { key: "data", label: "Settings", icon: "database" },
+  ],
+  clients: [
+    { id: uid(), name: "Hammoudi", biz: "YouTuber · 17k subs (Hamburg)", make: "Short-form + long-form edits", cadence: "TBD — retainer", loc: "Remote (DE)", status: "Prospect", arrangement: "Retainer", monthly: 0, contact: "", link: "", priority: true, notes: "TOP PRIORITY. Dad's contact. Money + pro setup. Send the retainer offer." },
+    { id: uid(), name: "Bianca's agency", biz: "Media agency (Dubai/RO)", make: "Talking-head edits", cadence: "On/off", loc: "Remote", status: "Cooling", arrangement: "Per video", monthly: 0, contact: "", link: "", priority: false, notes: "May: 38 vids ≈ 3,900 RON. Pivoting to film+edit. Pull the podcast-clip referral thread." },
+    { id: uid(), name: "Classmate (barber)", biz: "Barber", make: "2 premium + 1 fun video", cadence: "One-off", loc: "Local (cash)", status: "Active", arrangement: "Package", monthly: 0, contact: "", link: "", priority: false, notes: "Part of the 900 RON package. Portfolio gold." },
+    { id: uid(), name: "Colleague (barber)", biz: "Barber", make: "2 premium videos", cadence: "One-off", loc: "Local (cash)", status: "Active", arrangement: "Package", monthly: 0, contact: "", link: "", priority: false, notes: "Other half of the 900 RON package." },
+    { id: uid(), name: "New barber", biz: "Barber", make: "Cut + client interview video", cadence: "One-off", loc: "Local (cash)", status: "Lead", arrangement: "One-off", monthly: 0, contact: "", link: "", priority: false, notes: "Inbound. QUALIFY: what exactly, by when, budget. Quote premium-local." },
+    { id: uid(), name: "Delia", biz: "Nail technician", make: "Product / unboxing reels", cadence: "Occasional", loc: "Local (cash)", status: "Active", arrangement: "Per video", monthly: 0, contact: "", link: "", priority: false, notes: "~200 RON each. Repeat one-off. Raise toward 300." },
+    { id: uid(), name: "Keh Medias", biz: "Real estate (Canada)", make: "Reels", cadence: "Stalled", loc: "Remote", status: "Cold", arrangement: "Was retainer", monthly: 0, contact: "", link: "", priority: false, notes: "Was nearing $1k/mo. Let it sit; re-engage later from strength." },
+    { id: uid(), name: "Barbershop (first)", biz: "Barber", make: "Short-form", cadence: "Ended", loc: "Local (cash)", status: "Past", arrangement: "One-off", monthly: 0, contact: "", link: "", priority: false, notes: "First client. 100 RON/session. Don't reopen at that rate." },
+  ],
+  pipeline: [
+    { id: uid(), name: "Hammoudi retainer", source: "Dad's contact", want: "Editor for YT short + long form", value: 1000, stage: "Negotiating", next: "Send retainer offer", notes: "Biggest lever on the board.", invoiced: false },
+    { id: uid(), name: "New barber", source: "Inbound DM", want: "Cut + interview video", value: 300, stage: "Lead", next: "Qualify scope & quote", notes: "", invoiced: false },
+    { id: uid(), name: "Bianca podcast clips", source: "Agency referral", want: "Podcast clip editing (Dubai)", value: 500, stage: "Contacted", next: "Confirm she's sending leads", notes: "", invoiced: false },
+  ],
+  income: [],
+  expenses: [
+    { id: uid(), what: "DaVinci Resolve Studio", cat: "Software", date: today(), amount: 0, recurring: false, note: "One-time license (already owned)" },
+  ],
+  expenseCats: ["Software", "Gear", "Subscriptions", "Marketing", "Education", "Other"],
+  pricing: {
+    floor: "Never accept work under ~$20/hr equivalent. Filming or editing. If a job can't clear the floor, decline or re-scope.",
+    products: [
+      { id: uid(), title: "Volume editing", what: "Simple short-form: talking-head, podcast clips, basic captions. Money is in volume + recurrence.", local: "60–120 RON / video", west: "$15–$30 / video or bundled into a retainer", form: "Monthly retainer, e.g. 30 videos/mo for a fixed fee." },
+      { id: uid(), title: "Premium bespoke", what: "You film AND edit. Cinematic, custom. Priced on the result, not time.", local: "250–400 RON / video", west: "$80–$250+ / video (no ceiling)", form: "Project package or content retainer." },
+    ],
+    targets: [
+      { id: uid(), who: "Hammoudi (direct, DE)", aim: "$800–$1,200/mo for a defined deliverable (8–12 long-form + shorts)." },
+      { id: uid(), who: "Agency podcast clips", aim: "$400–$600/mo if Bianca refers steady work." },
+      { id: uid(), who: "Western content client", aim: "$2,000/mo (≈10 premium videos) — the Skyscraper anchor." },
+    ],
+    quote: "When asked 'how much?': 'It depends on the complexity and scope — send me what you need and I'll put together a price.' Never quote per hour. Always state the premium option first.",
+  },
+  pillars: [
+    { id: uid(), name: "Teach the craft", what: "Editing/filming tips, DaVinci tricks, before/afters", why: "People follow teachers. Searchable. Attracts learners & clients.", color: "#D8B45A", icon: "lightbulb" },
+    { id: uid(), name: "Process & proof", what: "You filming/editing real client work, BTS", why: "Shows competence → brands want to hire you.", color: "#4FB477", icon: "film" },
+    { id: uid(), name: "Opinion & taste", what: "Takes on editing, what makes content premium, gear myths", why: "Builds you as a voice → people follow the person.", color: "#5B9BD5", icon: "megaphone" },
+    { id: uid(), name: "The journey", what: "Raw building-in-public moments, wins & lessons", why: "Builds the bond. They root for YOU.", color: "#C77DBB", icon: "rocket" },
+  ],
+  cadence: [
+    { id: uid(), day: "Mon", ship: "Reel — tip", pillar: "Teach the craft", done: false },
+    { id: uid(), day: "Tue", ship: "Reel — hot take", pillar: "Opinion & taste", done: false },
+    { id: uid(), day: "Wed", ship: "Reel — process", pillar: "Process & proof", done: false },
+    { id: uid(), day: "Thu", ship: "Reel — journey", pillar: "The journey", done: false },
+    { id: uid(), day: "Fri", ship: "Reel — before/after", pillar: "Teach the craft", done: false },
+    { id: uid(), day: "Sat", ship: "Film + edit batch", pillar: "Batch day", done: false },
+    { id: uid(), day: "Sun", ship: "YouTube tutorial", pillar: "Teach (THE WEDGE)", done: false },
+  ],
+  ideas: [
+    { id: uid(), idea: "3 caption styles that look expensive", pillar: "Teach", platform: "Both", format: "Tip reel", hook: "Your captions look cheap. Here's the fix.", status: "Idea", priority: "High", notes: "" },
+    { id: uid(), idea: "Why your color grade looks amateur", pillar: "Teach", platform: "Both", format: "Tip reel", hook: "This one slider ruins your footage.", status: "Idea", priority: "Med", notes: "" },
+    { id: uid(), idea: "iPhone vs Canon for client work", pillar: "Opinion", platform: "Instagram", format: "Face-to-cam", hook: "You don't need the expensive camera. Proof inside.", status: "Idea", priority: "Med", notes: "" },
+    { id: uid(), idea: "Editing a real barber reel start to finish", pillar: "Process", platform: "YouTube", format: "Tutorial", hook: "Watch raw footage become a client-ready reel.", status: "Idea", priority: "High", notes: "" },
+    { id: uid(), idea: "What 16-yo me wishes he knew about editing", pillar: "Journey", platform: "Both", format: "Vlog", hook: "I wasted a year editing wrong.", status: "Idea", priority: "Low", notes: "" },
+  ],
+  posts: [],
+  social: [{ id: uid(), date: today(), ig: 481, yt: 767, note: "Baseline — day we built HQ" }],
+  goals: [
+    { id: uid(), name: "Monthly income", icon: "dollar", current: 0, target: 9000, unit: "RON", color: "#D8B45A", note: "Mid-point of the 8–10k target." },
+    { id: uid(), name: "Instagram followers", icon: "instagram", current: 481, target: 100000, unit: "", color: "#E1306C", note: "US/UK/Canada audience." },
+    { id: uid(), name: "YouTube subscribers", icon: "youtube", current: 767, target: 100000, unit: "", color: "#FF0000", note: "Tutorials are the wedge." },
+    { id: uid(), name: "Active retainers", icon: "briefcase", current: 0, target: 3, unit: "clients", color: "#4FB477", note: "3 retainers = stable base." },
+  ],
+  playbook: [
+    { id: uid(), cat: "Outreach", title: "Cold/warm intro — creator", body: "Hey [name], I've been watching your channel and the content's strong. I edit short + long form for creators (cinematic, fast turnaround) and I think a few tweaks could push your retention up. Want me to send a quick sample edit of one of your clips, no charge, so you can see the difference?" },
+    { id: uid(), cat: "Pricing", title: "When they ask 'how much?'", body: "It depends on the complexity and scope of the project — send me what you need (length, how many, style) and I'll put together a price. Generally I work either per-project for premium edits or on a monthly retainer if you want consistent volume." },
+    { id: uid(), cat: "Qualifying", title: "Questions before quoting", body: "1. What exactly do you need (format, length, how many)?\n2. By when?\n3. Is this a one-off or ongoing?\n4. What does a great result look like for you?\n5. What's your budget range?" },
+    { id: uid(), cat: "Onboarding", title: "New client kickoff", body: "Welcome! To start clean: (1) drop all footage in a shared Drive folder, (2) send 1–2 references for the vibe, (3) confirm aspect ratio + where it's posting, (4) deadline. I'll send a first cut, you get 2 rounds of revisions included." },
+  ],
+  playbookCats: ["Outreach", "Pricing", "Qualifying", "Onboarding", "Other"],
+  layers: [
+    { id: uid(), n: 1, name: "Personal Brand", desc: "IG (short-form) + YT (long-form). Audience of creators, young entrepreneurs, brands.", progress: 15, next: "Pivot to value content. Ship daily reels + weekly tutorial." },
+    { id: uid(), n: 2, name: "Collect Data", desc: "Emails via free value (guides, forms). Long-term asset.", progress: 0, next: "Build one free guide as a lead magnet once audience grows." },
+    { id: uid(), n: 3, name: "Digital Products", desc: "Useful products for brand & audience. Low + high ticket.", progress: 0, next: "Note product ideas as audience tells you their problems." },
+    { id: uid(), n: 4, name: "Community", desc: "Paid community ($20–30/mo). 100–500+ members = income stream.", progress: 0, next: "Not yet. Needs audience first." },
+    { id: uid(), n: 5, name: "Sponsorships", desc: "Aligned brand deals.", progress: 0, next: "Comes with reach. Park it." },
+    { id: uid(), n: 6, name: "The App", desc: "Brand-driven, high-utility app.", progress: 0, next: "Long-term. The summit." },
+  ],
+  tasks: [
+    { id: uid(), text: "Reply to Hammoudi with retainer offer", done: false, p: 1 },
+    { id: uid(), text: "Reply to Bianca re: film+edit / podcast clips", done: false, p: 1 },
+    { id: uid(), text: "Confirm classmate + colleague barber package (900 RON)", done: false, p: 2 },
+    { id: uid(), text: "Qualify new barber (scope, deadline, budget)", done: false, p: 2 },
+    { id: uid(), text: "Ship 1 YouTube tutorial this week", done: false, p: 3 },
+    { id: uid(), text: "Post daily short-form (new direction)", done: false, p: 3 },
+  ],
+};
+
+/* ============================ THEME ============================ */
+function makeTheme(settings) {
+  const A = settings.accent || "#D8B45A";
+  const glass = settings.glass !== false;
+  const aDim = A + "26";
+  return {
+    A, aDim, glass,
+    bg: glass ? "#0A0E18" : "#0B0F19",
+    text: "#EEF1F7", mut: "#9AA3B5", faint: "#6B7488",
+    line: glass ? "rgba(255,255,255,0.09)" : "#1E2638",
+    panel: glass ? "rgba(255,255,255,0.045)" : "#121826",
+    panel2: glass ? "rgba(255,255,255,0.025)" : "#0F1420",
+    panelSolid: "#121826",
+    green: "#54C08A", greenDim: "rgba(84,192,138,0.16)",
+    red: "#E0726B", redDim: "rgba(224,114,107,0.16)",
+    amber: "#E0A94A", amberDim: "rgba(224,169,74,0.16)",
+    blue: "#5B9BD5", purple: "#B985D8",
+    blur: glass ? "saturate(150%) blur(22px)" : "none",
+  };
+}
+const STATUS = (T) => ({
+  Active: { c: T.green, b: T.greenDim }, Prospect: { c: T.amber, b: T.amberDim },
+  Lead: { c: T.amber, b: T.amberDim }, Cooling: { c: T.red, b: T.redDim },
+  Stalled: { c: T.red, b: T.redDim }, Cold: { c: T.mut, b: "rgba(255,255,255,.06)" }, Past: { c: T.mut, b: "rgba(255,255,255,.06)" },
+});
+
+/* ============================ primitives ============================ */
+let T = makeTheme(DEFAULT.settings); // set per-render in App
+
+function Card({ children, style, glassStrength = "thin", accentBar, className = "" }) {
+  const base = T.glass ? {
+    background: glassStrength === "ultra" ? "rgba(255,255,255,0.03)" : glassStrength === "thick" ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.045)",
+    backdropFilter: T.blur, WebkitBackdropFilter: T.blur,
+    border: `1px solid ${T.line}`, borderRadius: 20,
+    boxShadow: "0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.07)",
+  } : { background: T.panel, border: `1px solid ${T.line}`, borderRadius: 16 };
+  return <div className={className} style={{ position: "relative", overflow: "hidden", ...base, ...style }}>
+    {accentBar && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: accentBar }} />}
+    {children}
+  </div>;
+}
+function Btn({ children, onClick, variant = "solid", size = "md", style, title }) {
+  const base = { border: "1px solid transparent", borderRadius: 12, cursor: "pointer", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6, transition: "all .15s", fontFamily: "inherit", whiteSpace: "nowrap", minHeight: size === "sm" ? 30 : 38 };
+  const sizes = { sm: { padding: "5px 11px", fontSize: 12 }, md: { padding: "9px 15px", fontSize: 13 } };
+  const variants = {
+    solid: { background: T.A, color: "#15100333" === "" ? "#000" : "#171205", boxShadow: T.glass ? `0 4px 16px ${T.A}44` : "none" },
+    ghost: { background: T.glass ? "rgba(255,255,255,0.06)" : T.panel2, color: T.text, border: `1px solid ${T.line}`, backdropFilter: T.blur, WebkitBackdropFilter: T.blur },
+    danger: { background: "transparent", color: T.red, border: `1px solid ${T.red}44` },
+    quiet: { background: "transparent", color: T.mut, border: `1px solid ${T.line}` },
+  };
+  return <button title={title} onClick={onClick} style={{ ...base, ...sizes[size], ...variants[variant], ...style }}>{children}</button>;
+}
+function IconBtn({ icon: Ic, onClick, title, color }) {
+  return <button title={title} onClick={onClick} style={{ background: "transparent", border: "none", cursor: "pointer", color: color || T.mut, padding: 6, borderRadius: 9, display: "inline-flex", minWidth: 30, minHeight: 30, alignItems: "center", justifyContent: "center" }}><Ic size={16} /></button>;
+}
+function Badge({ children, c, b }) {
+  return <span style={{ color: c, background: b, border: `1px solid ${c}33`, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>;
+}
+function Field({ label, children }) {
+  return <label style={{ display: "block", marginBottom: 14 }}><div style={{ fontSize: 11, color: T.mut, marginBottom: 6, fontWeight: 600, letterSpacing: .3 }}>{label}</div>{children}</label>;
+}
+const inputStyle = () => ({ width: "100%", background: T.glass ? "rgba(255,255,255,0.05)" : T.panel2, border: `1px solid ${T.line}`, borderRadius: 12, padding: "10px 12px", color: T.text, fontSize: 13, fontFamily: "inherit", boxSizing: "border-box", outline: "none", minHeight: 40 });
+function Input(props) { return <input {...props} style={{ ...inputStyle(), ...props.style }} />; }
+function Textarea(props) { return <textarea {...props} style={{ ...inputStyle(), minHeight: 80, resize: "vertical", ...props.style }} />; }
+function Select({ value, onChange, options }) {
+  return <select value={value} onChange={onChange} style={{ ...inputStyle(), appearance: "none" }}>{options.map((o) => <option key={o} value={o} style={{ background: T.panelSolid, color: T.text }}>{o || "—"}</option>)}</select>;
+}
+function Modal({ open, onClose, title, children, wide }) {
+  if (!open) return null;
+  return <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(4,7,13,.6)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "6vh 16px", overflowY: "auto" }}>
+    <div onClick={(e) => e.stopPropagation()} style={{ background: T.glass ? "rgba(22,28,42,0.85)" : T.panelSolid, backdropFilter: T.blur, WebkitBackdropFilter: T.blur, border: `1px solid ${T.line}`, borderRadius: 22, width: wide ? 720 : 470, maxWidth: "100%", boxShadow: "0 30px 80px rgba(0,0,0,.6)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 22px", borderBottom: `1px solid ${T.line}` }}>
+        <div style={{ fontWeight: 700, fontSize: 15.5, color: T.text }}>{title}</div>
+        <IconBtn icon={I_X} onClick={onClose} title="Close" />
+      </div>
+      <div style={{ padding: 22 }}>{children}</div>
+    </div>
+  </div>;
+}
+function Section({ title, sub, right, children, onEditTitle }) {
+  return <div style={{ marginBottom: 28 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
+      <div><h2 style={{ margin: 0, fontSize: 18, color: T.text, fontWeight: 700, letterSpacing: -.3 }}>{title}</h2>{sub && <div style={{ color: T.mut, fontSize: 12.5, marginTop: 4 }}>{sub}</div>}</div>
+      {right}
+    </div>
+    {children}
+  </div>;
+}
+function Empty({ icon: Ic, text }) {
+  return <div style={{ textAlign: "center", padding: "40px 16px", color: T.mut }}><Ic size={26} style={{ opacity: .5, marginBottom: 10 }} /><div style={{ fontSize: 13 }}>{text}</div></div>;
+}
+function Stat({ label, value, sub, accent, bar }) {
+  return <Card accentBar={accent} style={{ padding: 18 }}>
+    <div style={{ fontSize: 11.5, color: T.mut, fontWeight: 600, marginBottom: 8 }}>{label}</div>
+    <div style={{ fontSize: 25, color: T.text, fontWeight: 700, letterSpacing: -.6 }}>{value}</div>
+    {sub && <div style={{ fontSize: 11.5, color: T.mut, marginTop: 5 }}>{sub}</div>}
+    {bar != null && <div style={{ height: 4, background: T.line, borderRadius: 3, marginTop: 10, overflow: "hidden" }}><div style={{ width: `${Math.min(100, bar)}%`, height: "100%", background: accent, borderRadius: 3 }} /></div>}
+  </Card>;
+}
+function IconPicker({ value, onChange }) {
+  return <div style={{ display: "grid", gridTemplateColumns: "repeat(8,1fr)", gap: 6, maxHeight: 140, overflowY: "auto", padding: 8, background: T.panel2, borderRadius: 12, border: `1px solid ${T.line}` }}>
+    {ICON_KEYS.map((k) => { const Ic = ICONS[k]; const on = value === k; return <button key={k} onClick={() => onChange(k)} title={k} style={{ background: on ? T.aDim : "transparent", border: `1px solid ${on ? T.A : "transparent"}`, borderRadius: 9, padding: 8, cursor: "pointer", color: on ? T.A : T.mut, display: "grid", placeItems: "center" }}><Ic size={17} /></button>; })}
+  </div>;
+}
+function ColorPicker({ value, onChange }) {
+  return <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    {PRESET_ACCENTS.map((c) => <button key={c} onClick={() => onChange(c)} style={{ width: 28, height: 28, borderRadius: 8, background: c, border: value === c ? `2px solid ${T.text}` : "2px solid transparent", cursor: "pointer" }} />)}
+    <input type="color" value={value} onChange={(e) => onChange(e.target.value)} style={{ width: 36, height: 30, border: "none", background: "transparent", cursor: "pointer" }} />
+  </div>;
+}
+
+/* ============================ PAGES ============================ */
+
+function Dashboard({ s, set }) {
+  const tm = thisMonth(), lm = lastMonth();
+  const incThis = s.income.filter((i) => monthKey(i.date) === tm).reduce((a, b) => a + (+b.amount || 0), 0);
+  const incLast = s.income.filter((i) => monthKey(i.date) === lm).reduce((a, b) => a + (+b.amount || 0), 0);
+  const expThis = s.expenses.filter((e) => monthKey(e.date) === tm).reduce((a, b) => a + (+b.amount || 0), 0);
+  const profit = incThis - expThis;
+  const recurring = s.clients.filter((c) => c.status === "Active" && c.arrangement === "Retainer").reduce((a, b) => a + (+b.monthly || 0), 0);
+  const active = s.clients.filter((c) => c.status === "Active").length;
+  const owed = s.pipeline.filter((p) => p.stage === "Won").reduce((a, b) => a + (+b.value || 0), 0);
+  const goal = s.settings.goalRON || 1;
+  const pctGoal = Math.round((incThis / goal) * 100);
+  const [editMove, setEditMove] = useState(false);
+
+  const trend = (() => { const m = {}; s.income.forEach((i) => { const k = monthKey(i.date); if (k) m[k] = (m[k] || 0) + (+i.amount || 0); }); const a = Object.keys(m).sort().slice(-6).map((k) => ({ name: niceMonth(k), RON: m[k] })); return a.length ? a : [{ name: niceMonth(tm), RON: 0 }]; })();
+  const mix = (() => { const g = {}; s.clients.forEach((c) => { g[c.status] = (g[c.status] || 0) + 1; }); const ST = STATUS(T); return Object.entries(g).map(([k, v]) => ({ name: k, value: v, fill: (ST[k] || { c: T.mut }).c })); })();
+  const toggleTask = (id) => set((d) => ({ ...d, tasks: d.tasks.map((t) => t.id === id ? { ...t, done: !t.done } : t) }));
+  const addTask = (text) => set((d) => ({ ...d, tasks: [...d.tasks, { id: uid(), text, done: false, p: 2 }] }));
+  const delTask = (id) => set((d) => ({ ...d, tasks: d.tasks.filter((t) => t.id !== id) }));
+  const [newTask, setNewTask] = useState("");
+
+  return <div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 14, marginBottom: 22 }}>
+      <Stat label="Income this month" value={`${ron(incThis)} ${s.settings.currency}`} sub={`Goal ${ron(goal)} · ${pctGoal}%`} accent={T.A} bar={pctGoal} />
+      <Stat label="Profit this month" value={`${ron(profit)}`} sub={`After ${ron(expThis)} expenses`} accent={profit >= 0 ? T.green : T.red} />
+      <Stat label="Recurring / mo" value={`${ron(recurring)}`} sub="Active retainers" accent={T.green} />
+      <Stat label="Active clients" value={active} sub={`${s.pipeline.filter(p => !["Won", "Paid", "Lost"].includes(p.stage)).length} in pipeline`} accent={T.blue} />
+      <Stat label="Money owed" value={`${ron(owed)}`} sub="Won, not yet paid" accent={T.amber} />
+    </div>
+
+    <Card glassStrength="thick" style={{ padding: 20, marginBottom: 22, borderColor: T.A + "55" }}>
+      <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ width: 46, height: 46, borderRadius: 14, background: T.aDim, display: "grid", placeItems: "center", flexShrink: 0 }}><I_Flame size={24} color={T.A} /></div>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ fontSize: 11, color: T.A, fontWeight: 700, letterSpacing: 1 }}>THE NEXT MOVE</div>
+          {editMove ? <>
+            <Input value={s.settings.nextMoveTitle} onChange={(e) => set((d) => ({ ...d, settings: { ...d.settings, nextMoveTitle: e.target.value } }))} style={{ marginTop: 6, marginBottom: 6 }} />
+            <Textarea value={s.settings.nextMoveText} onChange={(e) => set((d) => ({ ...d, settings: { ...d.settings, nextMoveText: e.target.value } }))} />
+          </> : <>
+            <div style={{ fontSize: 16, color: T.text, fontWeight: 700, marginTop: 3 }}>{s.settings.nextMoveTitle}</div>
+            <div style={{ fontSize: 12.5, color: T.mut, marginTop: 4 }}>{s.settings.nextMoveText}</div>
+          </>}
+        </div>
+        <IconBtn icon={editMove ? I_Check : I_Pencil} onClick={() => setEditMove(!editMove)} title="Edit" color={editMove ? T.green : T.mut} />
+      </div>
+    </Card>
+
+    <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 16, marginBottom: 22 }} className="hq-grid2">
+      <Card style={{ padding: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Income — last 6 months</div>
+        <div style={{ height: 220 }}><SvgBar data={trend} dataKey="RON" color={T.A} /></div>
+      </Card>
+      <Card style={{ padding: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Client status</div>
+        <div style={{ height: 200 }}><SvgDonut data={mix} /></div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 10 }}>
+          {mix.map((m, i) => <span key={i} style={{ fontSize: 11, color: T.mut, display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: m.fill }} />{m.name} {m.value}</span>)}
+        </div>
+      </Card>
+    </div>
+
+    <Card style={{ padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Action queue</div>
+        <span style={{ fontSize: 11, color: T.mut }}>{s.tasks.filter((t) => !t.done).length} open</span>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <Input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Add a task…" onKeyDown={(e) => { if (e.key === "Enter" && newTask.trim()) { addTask(newTask.trim()); setNewTask(""); } }} />
+        <Btn onClick={() => { if (newTask.trim()) { addTask(newTask.trim()); setNewTask(""); } }}><I_Plus size={15} /></Btn>
+      </div>
+      <div>
+        {s.tasks.map((t) => <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 11, padding: "10px 8px", borderRadius: 10, opacity: t.done ? .45 : 1 }} className="hq-row">
+          <span onClick={() => toggleTask(t.id)} style={{ cursor: "pointer", display: "flex" }}>{t.done ? <I_CheckCircle2 size={18} color={T.green} /> : <I_Circle size={18} color={T.mut} />}</span>
+          <span onClick={() => toggleTask(t.id)} style={{ fontSize: 13.5, color: T.text, textDecoration: t.done ? "line-through" : "none", flex: 1, cursor: "pointer" }}>{t.text}</span>
+          <Badge c={t.p === 1 ? T.red : t.p === 2 ? T.amber : T.mut} b={t.p === 1 ? T.redDim : t.p === 2 ? T.amberDim : "rgba(255,255,255,.06)"}>{t.p === 1 ? "NOW" : t.p === 2 ? "THIS WEEK" : "ONGOING"}</Badge>
+          <IconBtn icon={I_Trash2} onClick={() => delTask(t.id)} title="Delete" color={T.faint} />
+        </div>)}
+      </div>
+    </Card>
+  </div>;
+}
+
+/* ---------------- Clients ---------------- */
+function Clients({ s, set }) {
+  const ST = STATUS(T);
+  const [edit, setEdit] = useState(null);
+  const [filter, setFilter] = useState("All");
+  const blank = { id: "", name: "", biz: "", make: "", cadence: "", loc: "Local (cash)", status: "Lead", arrangement: "One-off", monthly: 0, contact: "", link: "", priority: false, notes: "" };
+  const list = filter === "All" ? s.clients : s.clients.filter((c) => c.status === filter);
+  const save = (c) => { set((d) => c.id ? { ...d, clients: d.clients.map((x) => x.id === c.id ? c : x) } : { ...d, clients: [{ ...c, id: uid() }, ...d.clients] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, clients: d.clients.filter((c) => c.id !== id) }));
+  const filters = ["All", "Active", "Prospect", "Lead", "Cooling", "Cold", "Past"];
+  return <Section title="Clients" sub="Everyone you work with. The Dashboard totals read from here." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add client</Btn>}>
+    <div style={{ display: "flex", gap: 7, marginBottom: 16, flexWrap: "wrap" }}>
+      {filters.map((f) => <button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 13px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${filter === f ? T.A : T.line}`, background: filter === f ? T.aDim : "transparent", color: filter === f ? T.A : T.mut }}>{f}</button>)}
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 14 }}>
+      {list.map((c) => { const st = ST[c.status] || { c: T.mut, b: "rgba(255,255,255,.06)" }; return <Card key={c.id} style={{ padding: 18, borderColor: c.priority ? T.A + "66" : T.line }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>{c.priority && <I_Star size={14} color={T.A} fill={T.A} />}<span style={{ fontSize: 15, fontWeight: 700, color: T.text }}>{c.name}</span></div>
+          <Badge c={st.c} b={st.b}>{c.status}</Badge>
+        </div>
+        <div style={{ fontSize: 12, color: T.mut, marginBottom: 10 }}>{c.biz}</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+          {c.make && <Chip label={c.make} />}{c.loc && <Chip label={c.loc} />}{c.arrangement && <Chip label={c.arrangement} />}
+          {c.arrangement === "Retainer" && +c.monthly > 0 && <Chip label={`${ron(c.monthly)} ${s.settings.currency}/mo`} hot />}
+          {c.contact && <Chip label={c.contact} />}
+        </div>
+        {c.notes && <div style={{ fontSize: 12, color: T.mut, lineHeight: 1.5, paddingTop: 8, borderTop: `1px solid ${T.line}` }}>{c.notes}</div>}
+        <div style={{ display: "flex", gap: 4, justifyContent: "flex-end", marginTop: 10 }}><IconBtn icon={I_Pencil} onClick={() => setEdit(c)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(c.id)} title="Delete" color={T.red} /></div>
+      </Card>; })}
+    </div>
+    {list.length === 0 && <Empty icon={I_Users} text="No clients in this view yet." />}
+    {edit && <ClientModal init={edit} onClose={() => setEdit(null)} onSave={save} />}
+  </Section>;
+}
+function Chip({ label, hot }) { return <span style={{ fontSize: 11, color: hot ? T.A : T.mut, background: hot ? T.aDim : (T.glass ? "rgba(255,255,255,.05)" : T.panel2), border: `1px solid ${hot ? T.A + "55" : T.line}`, padding: "3px 8px", borderRadius: 8 }}>{label}</span>; }
+function ClientModal({ init, onClose, onSave }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <Modal open onClose={onClose} title={init.id ? "Edit client" : "Add client"} wide>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Name"><Input value={f.name} onChange={(e) => u("name", e.target.value)} /></Field>
+      <Field label="Type of business"><Input value={f.biz} onChange={(e) => u("biz", e.target.value)} /></Field>
+      <Field label="What you make"><Input value={f.make} onChange={(e) => u("make", e.target.value)} /></Field>
+      <Field label="Cadence"><Input value={f.cadence} onChange={(e) => u("cadence", e.target.value)} /></Field>
+      <Field label="Location"><Select value={f.loc} onChange={(e) => u("loc", e.target.value)} options={["Local (cash)", "Remote", "Remote (DE)", "Remote (PayPal)"]} /></Field>
+      <Field label="Status"><Select value={f.status} onChange={(e) => u("status", e.target.value)} options={["Active", "Prospect", "Lead", "Cooling", "Stalled", "Cold", "Past"]} /></Field>
+      <Field label="Arrangement"><Select value={f.arrangement} onChange={(e) => u("arrangement", e.target.value)} options={["One-off", "Package", "Per video", "Retainer", "Was retainer"]} /></Field>
+      <Field label="Monthly (retainers only)"><Input type="number" value={f.monthly} onChange={(e) => u("monthly", e.target.value)} /></Field>
+      <Field label="Contact / handle"><Input value={f.contact} onChange={(e) => u("contact", e.target.value)} placeholder="@handle / email" /></Field>
+      <Field label="Link"><Input value={f.link} onChange={(e) => u("link", e.target.value)} placeholder="profile / drive" /></Field>
+    </div>
+    <Field label="Notes"><Textarea value={f.notes} onChange={(e) => u("notes", e.target.value)} /></Field>
+    <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, cursor: "pointer" }}><input type="checkbox" checked={f.priority} onChange={(e) => u("priority", e.target.checked)} /><span style={{ fontSize: 13, color: T.text }}>Mark as priority client</span></label>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.name && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </Modal>;
+}
+
+/* ---------------- Pipeline (with Won → Paid → auto-income) ---------------- */
+function Pipeline({ s, set }) {
+  const stages = ["Lead", "Contacted", "Negotiating", "Won", "Paid"];
+  const stageColor = { Lead: T.mut, Contacted: T.blue, Negotiating: T.amber, Won: T.green, Paid: T.A, Lost: T.red };
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", name: "", source: "", want: "", value: 0, stage: "Lead", next: "", notes: "", invoiced: false };
+  const save = (l) => { set((d) => l.id ? { ...d, pipeline: d.pipeline.map((x) => x.id === l.id ? l : x) } : { ...d, pipeline: [{ ...l, id: uid() }, ...d.pipeline] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, pipeline: d.pipeline.filter((x) => x.id !== id) }));
+
+  // moving to "Paid" auto-creates one income entry (idempotent via invoiced flag)
+  const setStage = (id, stage) => set((d) => {
+    let income = d.pipeline_addedIncome ? d.income : d.income;
+    const pipeline = d.pipeline.map((x) => {
+      if (x.id !== id) return x;
+      const upd = { ...x, stage };
+      if (stage === "Paid" && !x.invoiced) {
+        upd.invoiced = true;
+        income = [{ id: uid(), client: x.name.replace(/ retainer$/i, ""), what: x.want || "Closed deal", date: today(), amount: +x.value || 0, method: "Auto (pipeline)", fromPipeline: x.id }, ...income];
+      }
+      return upd;
+    });
+    return { ...d, pipeline, income };
+  });
+  const move = (id, dir) => { const cur = s.pipeline.find((p) => p.id === id); const i = stages.indexOf(cur.stage); const ni = Math.max(0, Math.min(stages.length - 1, i + dir)); setStage(id, stages[ni]); };
+  const markLost = (id) => setStage(id, "Lost");
+
+  const allStages = [...stages, "Lost"];
+  return <Section title="Pipeline" sub="Move leads toward the close. When a deal hits Paid, it logs to Income automatically." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add lead</Btn>}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 12 }}>
+      {allStages.map((st) => { const items = s.pipeline.filter((p) => p.stage === st); return <div key={st} style={{ background: T.glass ? "rgba(255,255,255,.025)" : T.panel2, border: `1px solid ${T.line}`, borderRadius: 16, padding: 12, minHeight: 120 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><span style={{ fontSize: 12, fontWeight: 700, color: stageColor[st] }}>{st}</span><span style={{ fontSize: 11, color: T.mut }}>{items.length}</span></div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {items.map((l) => <Card key={l.id} glassStrength="ultra" style={{ padding: 12, borderRadius: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 3 }}>{l.name}</div>
+            <div style={{ fontSize: 11, color: T.mut, marginBottom: 6 }}>{l.want}</div>
+            {+l.value > 0 && <div style={{ fontSize: 11.5, color: T.A, fontWeight: 700, marginBottom: 6 }}>{ron(l.value)} {s.settings.currency}</div>}
+            {l.stage === "Paid" && l.invoiced && <div style={{ fontSize: 10.5, color: T.green, marginBottom: 6 }}>✓ Logged to income</div>}
+            {l.next && l.stage !== "Paid" && l.stage !== "Lost" && <div style={{ fontSize: 11, color: T.mut, fontStyle: "italic", marginBottom: 8 }}>Next: {l.next}</div>}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 2 }}><IconBtn icon={I_Pencil} onClick={() => setEdit(l)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(l.id)} title="Delete" color={T.red} /></div>
+              <div style={{ display: "flex", gap: 3 }}>
+                {l.stage !== "Lost" && <button onClick={() => move(l.id, -1)} title="Back" style={{ background: "transparent", border: `1px solid ${T.line}`, borderRadius: 7, color: T.mut, cursor: "pointer", padding: "3px 7px", fontSize: 11 }}>←</button>}
+                {l.stage !== "Lost" && l.stage !== "Paid" && <button onClick={() => move(l.id, 1)} title="Advance" style={{ background: T.aDim, border: `1px solid ${T.A}55`, borderRadius: 7, color: T.A, cursor: "pointer", padding: "3px 7px", fontSize: 11 }}>→</button>}
+                {l.stage !== "Lost" && l.stage !== "Paid" && <button onClick={() => markLost(l.id)} title="Mark lost" style={{ background: "transparent", border: `1px solid ${T.red}44`, borderRadius: 7, color: T.red, cursor: "pointer", padding: "3px 7px", fontSize: 11 }}>✕</button>}
+              </div>
+            </div>
+          </Card>)}
+        </div>
+      </div>; })}
+    </div>
+    {edit && <PipelineModal init={edit} onClose={() => setEdit(null)} onSave={save} stages={allStages} />}
+  </Section>;
+}
+function PipelineModal({ init, onClose, onSave, stages }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <Modal open onClose={onClose} title={init.id ? "Edit lead" : "Add lead"}>
+    <Field label="Name"><Input value={f.name} onChange={(e) => u("name", e.target.value)} /></Field>
+    <Field label="Source"><Input value={f.source} onChange={(e) => u("source", e.target.value)} /></Field>
+    <Field label="What they want"><Input value={f.want} onChange={(e) => u("want", e.target.value)} /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Est. value"><Input type="number" value={f.value} onChange={(e) => u("value", e.target.value)} /></Field>
+      <Field label="Stage"><Select value={f.stage} onChange={(e) => u("stage", e.target.value)} options={stages} /></Field>
+    </div>
+    <Field label="Next step"><Input value={f.next} onChange={(e) => u("next", e.target.value)} /></Field>
+    <Field label="Notes"><Textarea value={f.notes} onChange={(e) => u("notes", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.name && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </Modal>;
+}
+
+/* ---------------- Income ---------------- */
+function Income({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", client: "", what: "", date: today(), amount: "", method: "Cash" };
+  const save = (e) => { set((d) => e.id ? { ...d, income: d.income.map((x) => x.id === e.id ? e : x) } : { ...d, income: [{ ...e, id: uid() }, ...d.income] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, income: d.income.filter((x) => x.id !== id) }));
+  const sorted = [...s.income].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const total = s.income.reduce((a, b) => a + (+b.amount || 0), 0);
+  const tm = s.income.filter((i) => monthKey(i.date) === thisMonth()).reduce((a, b) => a + (+b.amount || 0), 0);
+  const lm = s.income.filter((i) => monthKey(i.date) === lastMonth()).reduce((a, b) => a + (+b.amount || 0), 0);
+  const trend = (() => { const m = {}; s.income.forEach((i) => { const k = monthKey(i.date); if (k) m[k] = (m[k] || 0) + (+i.amount || 0); }); return Object.keys(m).sort().slice(-8).map((k) => ({ name: niceMonth(k), RON: m[k] })); })();
+  const cur = s.settings.currency;
+  return <Section title="Income" sub="Logs from the pipeline automatically when a deal is Paid. You can also add any payment manually." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Log payment</Btn>}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 18 }}>
+      <Stat label="This month" value={`${ron(tm)} ${cur}`} accent={T.A} />
+      <Stat label="Last month" value={`${ron(lm)} ${cur}`} accent={T.blue} />
+      <Stat label="All-time" value={`${ron(total)} ${cur}`} accent={T.green} />
+    </div>
+    {trend.length > 0 && <Card style={{ padding: 20, marginBottom: 18 }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Monthly income</div><div style={{ height: 180 }}><SvgArea data={trend} dataKey="RON" color={T.A} /></div></Card>}
+    <Card style={{ padding: 0 }}>
+      {sorted.length === 0 ? <Empty icon={I_Wallet} text="No payments yet. Close a deal in Pipeline (mark it Paid) or log one manually." /> : <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "Client", "For", "Amount", "Method", ""].map((h) => <th key={h} style={{ textAlign: h === "Amount" ? "right" : "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
+          <tbody>{sorted.map((i) => <tr key={i.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{i.date}</td>
+            <td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{i.client}</td>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{i.what}</td>
+            <td style={{ padding: "11px 14px", color: T.A, fontWeight: 700, textAlign: "right" }}>{ron(i.amount)} {cur}</td>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{i.fromPipeline ? <Badge c={T.green} b={T.greenDim}>Auto</Badge> : i.method}</td>
+            <td style={{ padding: "11px 14px", textAlign: "right" }}><IconBtn icon={I_Pencil} onClick={() => setEdit(i)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(i.id)} title="Delete" color={T.red} /></td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+    </Card>
+    {edit && <IncomeModal init={edit} onClose={() => setEdit(null)} onSave={save} clients={s.clients} />}
+  </Section>;
+}
+function IncomeModal({ init, onClose, onSave, clients }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <Modal open onClose={onClose} title={init.id ? "Edit payment" : "Log payment"}>
+    <Field label="Client"><Select value={f.client} onChange={(e) => u("client", e.target.value)} options={["", ...clients.map((c) => c.name), "Other"]} /></Field>
+    <Field label="What for"><Input value={f.what} onChange={(e) => u("what", e.target.value)} placeholder="e.g. 2 premium reels" /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Date paid"><Input type="date" value={f.date} onChange={(e) => u("date", e.target.value)} /></Field>
+      <Field label="Amount"><Input type="number" value={f.amount} onChange={(e) => u("amount", e.target.value)} /></Field>
+    </div>
+    <Field label="Method"><Select value={f.method} onChange={(e) => u("method", e.target.value)} options={["Cash", "PayPal", "Bank transfer", "Other"]} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.amount && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </Modal>;
+}
+
+/* ---------------- Expenses (new) ---------------- */
+function Expenses({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", what: "", cat: "Software", date: today(), amount: "", recurring: false, note: "" };
+  const save = (e) => { set((d) => e.id ? { ...d, expenses: d.expenses.map((x) => x.id === e.id ? e : x) } : { ...d, expenses: [{ ...e, id: uid() }, ...d.expenses] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, expenses: d.expenses.filter((x) => x.id !== id) }));
+  const sorted = [...s.expenses].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const tm = s.expenses.filter((e) => monthKey(e.date) === thisMonth()).reduce((a, b) => a + (+b.amount || 0), 0);
+  const recurring = s.expenses.filter((e) => e.recurring).reduce((a, b) => a + (+b.amount || 0), 0);
+  const total = s.expenses.reduce((a, b) => a + (+b.amount || 0), 0);
+  const cur = s.settings.currency;
+  const byCat = (() => { const g = {}; s.expenses.forEach((e) => { g[e.cat] = (g[e.cat] || 0) + (+e.amount || 0); }); const cols = [T.A, T.blue, T.green, T.purple, T.amber, T.red]; return Object.entries(g).map(([k, v], i) => ({ name: k, value: v, fill: cols[i % cols.length] })); })();
+  return <Section title="Expenses" sub="Track software, gear, subscriptions. Income minus expenses is your real profit." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add expense</Btn>}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 18 }}>
+      <Stat label="This month" value={`${ron(tm)} ${cur}`} accent={T.red} />
+      <Stat label="Recurring / mo" value={`${ron(recurring)} ${cur}`} accent={T.amber} />
+      <Stat label="All-time" value={`${ron(total)} ${cur}`} accent={T.mut} />
+    </div>
+    {byCat.length > 0 && total > 0 && <Card style={{ padding: 20, marginBottom: 18 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>By category</div>
+      <div style={{ height: 180 }}><SvgDonut data={byCat} /></div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 10 }}>{byCat.map((m, i) => <span key={i} style={{ fontSize: 11, color: T.mut, display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: m.fill }} />{m.name} {ron(m.value)}</span>)}</div>
+    </Card>}
+    <Card style={{ padding: 0 }}>
+      {sorted.length === 0 ? <Empty icon={I_Receipt} text="No expenses logged. Add your software and gear costs to see true profit." /> : <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "What", "Category", "Amount", "Recurring", ""].map((h) => <th key={h} style={{ textAlign: h === "Amount" ? "right" : "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
+          <tbody>{sorted.map((e) => <tr key={e.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{e.date}</td>
+            <td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{e.what}</td>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{e.cat}</td>
+            <td style={{ padding: "11px 14px", color: T.red, fontWeight: 700, textAlign: "right" }}>{ron(e.amount)} {cur}</td>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{e.recurring ? <Badge c={T.amber} b={T.amberDim}>Monthly</Badge> : "—"}</td>
+            <td style={{ padding: "11px 14px", textAlign: "right" }}><IconBtn icon={I_Pencil} onClick={() => setEdit(e)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(e.id)} title="Delete" color={T.red} /></td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+    </Card>
+    {edit && <ExpenseModal init={edit} cats={s.expenseCats} onClose={() => setEdit(null)} onSave={save} />}
+  </Section>;
+}
+function ExpenseModal({ init, cats, onClose, onSave }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <Modal open onClose={onClose} title={init.id ? "Edit expense" : "Add expense"}>
+    <Field label="What"><Input value={f.what} onChange={(e) => u("what", e.target.value)} placeholder="e.g. Adobe / lens / hosting" /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Category"><Select value={f.cat} onChange={(e) => u("cat", e.target.value)} options={cats} /></Field>
+      <Field label="Amount"><Input type="number" value={f.amount} onChange={(e) => u("amount", e.target.value)} /></Field>
+      <Field label="Date"><Input type="date" value={f.date} onChange={(e) => u("date", e.target.value)} /></Field>
+    </div>
+    <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, cursor: "pointer" }}><input type="checkbox" checked={f.recurring} onChange={(e) => u("recurring", e.target.checked)} /><span style={{ fontSize: 13, color: T.text }}>Recurring monthly cost</span></label>
+    <Field label="Note"><Input value={f.note} onChange={(e) => u("note", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.what && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </Modal>;
+}
+
+/* ---------------- Pricing (everything editable) ---------------- */
+function Pricing({ s, set }) {
+  const p = s.pricing;
+  const [editing, setEditing] = useState(false);
+  const [d, setD] = useState(p);
+  useEffect(() => setD(p), [editing]);
+  const save = () => { set((st) => ({ ...st, pricing: d })); setEditing(false); };
+  const addProduct = () => setD((x) => ({ ...x, products: [...x.products, { id: uid(), title: "New product", what: "", local: "", west: "", form: "" }] }));
+  const delProduct = (id) => setD((x) => ({ ...x, products: x.products.filter((q) => q.id !== id) }));
+  const upProduct = (id, k, v) => setD((x) => ({ ...x, products: x.products.map((q) => q.id === id ? { ...q, [k]: v } : q) }));
+  const addTarget = () => setD((x) => ({ ...x, targets: [...x.targets, { id: uid(), who: "", aim: "" }] }));
+  const delTarget = (id) => setD((x) => ({ ...x, targets: x.targets.filter((q) => q.id !== id) }));
+  const upTarget = (id, k, v) => setD((x) => ({ ...x, targets: x.targets.map((q) => q.id === id ? { ...q, [k]: v } : q) }));
+  const view = editing ? d : p;
+  return <Section title="Pricing" sub="Your rate card. Two products, retainer targets, a floor — all editable." right={editing ? <div style={{ display: "flex", gap: 8 }}><Btn variant="ghost" onClick={() => setEditing(false)}>Cancel</Btn><Btn onClick={save}><I_Check size={15} /> Save</Btn></div> : <Btn variant="ghost" onClick={() => setEditing(true)}><I_Pencil size={14} /> Edit all</Btn>}>
+    <Card style={{ padding: 18, marginBottom: 14, borderColor: T.red + "55" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}><I_AlertCircle size={18} color={T.red} style={{ marginTop: 1, flexShrink: 0 }} /><div style={{ flex: 1 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: T.red, letterSpacing: .5, marginBottom: 4 }}>THE FLOOR</div>
+        {editing ? <Textarea value={d.floor} onChange={(e) => setD({ ...d, floor: e.target.value })} /> : <div style={{ fontSize: 13, color: T.text, lineHeight: 1.5 }}>{p.floor}</div>}
+      </div></div>
+    </Card>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 14, marginBottom: 14 }}>
+      {view.products.map((pr, idx) => <Card key={pr.id} style={{ padding: 18, borderColor: idx === view.products.length - 1 && idx > 0 ? T.A + "66" : T.line }}>
+        {editing ? <>
+          <Field label="Title"><Input value={pr.title} onChange={(e) => upProduct(pr.id, "title", e.target.value)} /></Field>
+          <Field label="What"><Textarea value={pr.what} onChange={(e) => upProduct(pr.id, "what", e.target.value)} /></Field>
+          <Field label="Local price"><Input value={pr.local} onChange={(e) => upProduct(pr.id, "local", e.target.value)} /></Field>
+          <Field label="Western price"><Input value={pr.west} onChange={(e) => upProduct(pr.id, "west", e.target.value)} /></Field>
+          <Field label="Best form"><Input value={pr.form} onChange={(e) => upProduct(pr.id, "form", e.target.value)} /></Field>
+          <Btn variant="danger" size="sm" onClick={() => delProduct(pr.id)}><I_Trash2 size={13} /> Remove</Btn>
+        </> : <>
+          <div style={{ fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 10 }}>{pr.title}</div>
+          <div style={{ fontSize: 12.5, color: T.mut, lineHeight: 1.5, marginBottom: 10 }}>{pr.what}</div>
+          <PriceRow label="Local" val={pr.local} /><PriceRow label="Western" val={pr.west} /><PriceRow label="Best form" val={pr.form} />
+        </>}
+      </Card>)}
+      {editing && <button onClick={addProduct} style={{ border: `1.5px dashed ${T.line}`, borderRadius: 16, background: "transparent", color: T.mut, cursor: "pointer", fontSize: 13, fontWeight: 600, minHeight: 120 }}>+ Add product</button>}
+    </div>
+    <Card style={{ padding: 20, marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Retainer targets — the real money</div>{editing && <Btn size="sm" onClick={addTarget}><I_Plus size={13} /> Add</Btn>}</div>
+      {view.targets.map((t) => <div key={t.id} style={{ display: "flex", gap: 12, padding: "9px 0", borderBottom: `1px solid ${T.line}`, alignItems: "center" }}>
+        {editing ? <>
+          <Input value={t.who} onChange={(e) => upTarget(t.id, "who", e.target.value)} style={{ width: 200 }} />
+          <Input value={t.aim} onChange={(e) => upTarget(t.id, "aim", e.target.value)} />
+          <IconBtn icon={I_Trash2} onClick={() => delTarget(t.id)} title="Remove" color={T.red} />
+        </> : <><div style={{ fontSize: 13, color: T.text, fontWeight: 600, width: 200, flexShrink: 0 }}>{t.who}</div><div style={{ fontSize: 12.5, color: T.mut }}>{t.aim}</div></>}
+      </div>)}
+    </Card>
+    <Card glassStrength="thick" style={{ padding: 18, borderColor: T.A + "55" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}><I_Sparkles size={17} color={T.A} style={{ marginTop: 1, flexShrink: 0 }} /><div style={{ flex: 1 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: T.A, marginBottom: 4 }}>HOW TO QUOTE</div>
+        {editing ? <Textarea value={d.quote} onChange={(e) => setD({ ...d, quote: e.target.value })} /> : <div style={{ fontSize: 13, color: T.text, lineHeight: 1.55 }}>{p.quote}</div>}
+      </div></div>
+    </Card>
+  </Section>;
+}
+function PriceRow({ label, val }) { return <div style={{ display: "flex", gap: 12, padding: "8px 0", borderBottom: `1px solid ${T.line}` }}><div style={{ fontSize: 12.5, color: T.mut, width: 90, flexShrink: 0, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 13, color: T.text }}>{val}</div></div>; }
+
+/* ---------------- Content Engine (pillars + week + ideas all editable) ---------------- */
+function Content({ s, set }) {
+  const [tab, setTab] = useState("week");
+  const tabs = [["week", "This week"], ["pillars", "Pillars"], ["ideas", "Idea bank"], ["log", "Post log"]];
+  return <Section title="Content Engine" sub="Ideas come from this system, not from inspiration. Everything here is editable.">
+    <div style={{ display: "flex", gap: 7, marginBottom: 18, flexWrap: "wrap" }}>{tabs.map(([k, l]) => <button key={k} onClick={() => setTab(k)} style={{ padding: "8px 15px", borderRadius: 10, fontSize: 12.5, fontWeight: 600, cursor: "pointer", border: `1px solid ${tab === k ? T.A : T.line}`, background: tab === k ? T.aDim : "transparent", color: tab === k ? T.A : T.mut }}>{l}</button>)}</div>
+    {tab === "week" && <WeekTab s={s} set={set} />}
+    {tab === "pillars" && <PillarsTab s={s} set={set} />}
+    {tab === "ideas" && <IdeasTab s={s} set={set} />}
+    {tab === "log" && <PostLogTab s={s} set={set} />}
+  </Section>;
+}
+function WeekTab({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", day: "Mon", ship: "", pillar: "", done: false };
+  const done = s.cadence.filter((c) => c.done).length;
+  const toggle = (id) => set((d) => ({ ...d, cadence: d.cadence.map((c) => c.id === id ? { ...c, done: !c.done } : c) }));
+  const reset = () => set((d) => ({ ...d, cadence: d.cadence.map((c) => ({ ...c, done: false })) }));
+  const save = (c) => { set((d) => c.id ? { ...d, cadence: d.cadence.map((x) => x.id === c.id ? c : x) } : { ...d, cadence: [...d.cadence, { ...c, id: uid() }] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, cadence: d.cadence.filter((x) => x.id !== id) }));
+  return <Card style={{ padding: 20 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4, flexWrap: "wrap", gap: 8 }}>
+      <div><div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Weekly shipping checklist</div><div style={{ fontSize: 12, color: T.mut, marginTop: 2 }}>{done}/{s.cadence.length} shipped this week</div></div>
+      <div style={{ display: "flex", gap: 8 }}><Btn variant="quiet" size="sm" onClick={reset}><I_RotateCcw size={13} /> Reset</Btn><Btn size="sm" onClick={() => setEdit(blank)}><I_Plus size={13} /> Add</Btn></div>
+    </div>
+    <div style={{ height: 4, background: T.line, borderRadius: 3, margin: "12px 0", overflow: "hidden" }}><div style={{ width: `${(done / Math.max(1, s.cadence.length)) * 100}%`, height: "100%", background: T.green }} /></div>
+    {s.cadence.map((c) => <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 6px", borderRadius: 10, opacity: c.done ? .5 : 1 }} className="hq-row">
+      <span onClick={() => toggle(c.id)} style={{ cursor: "pointer", display: "flex" }}>{c.done ? <I_CheckCircle2 size={18} color={T.green} /> : <I_Circle size={18} color={T.mut} />}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, color: T.A, width: 36 }}>{c.day}</span>
+      <span onClick={() => toggle(c.id)} style={{ fontSize: 13.5, color: T.text, flex: 1, textDecoration: c.done ? "line-through" : "none", cursor: "pointer" }}>{c.ship}</span>
+      <span style={{ fontSize: 11.5, color: T.mut, display: "none" }} className="hq-show-md">{c.pillar}</span>
+      <IconBtn icon={I_Pencil} onClick={() => setEdit(c)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(c.id)} title="Delete" color={T.faint} />
+    </div>)}
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit slot" : "Add slot"}><CadenceForm init={edit} pillars={s.pillars} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </Card>;
+}
+function CadenceForm({ init, pillars, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14 }}>
+      <Field label="Day"><Select value={f.day} onChange={(e) => u("day", e.target.value)} options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} /></Field>
+      <Field label="What to ship"><Input value={f.ship} onChange={(e) => u("ship", e.target.value)} /></Field>
+    </div>
+    <Field label="Pillar / label"><Input value={f.pillar} onChange={(e) => u("pillar", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.ship && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+function PillarsTab({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", name: "", what: "", why: "", color: T.A, icon: "lightbulb" };
+  const save = (p) => { set((d) => p.id ? { ...d, pillars: d.pillars.map((x) => x.id === p.id ? p : x) } : { ...d, pillars: [...d.pillars, { ...p, id: uid() }] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, pillars: d.pillars.filter((x) => x.id !== id) }));
+  return <>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}><Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add pillar</Btn></div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 14 }}>
+      {s.pillars.map((p) => <Card key={p.id} style={{ padding: 18, borderTop: `3px solid ${p.color}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}><div style={{ width: 32, height: 32, borderRadius: 10, background: p.color + "22", display: "grid", placeItems: "center" }}><Icon name={p.icon} size={17} color={p.color} /></div><div style={{ fontSize: 15, fontWeight: 700, color: T.text }}>{p.name}</div></div>
+        <div style={{ fontSize: 12.5, color: T.mut, lineHeight: 1.5, marginBottom: 12 }}>{p.what}</div>
+        <div style={{ fontSize: 12, color: p.color, lineHeight: 1.5, paddingTop: 10, borderTop: `1px solid ${T.line}` }}><b>Why it converts:</b> {p.why}</div>
+        <div style={{ display: "flex", gap: 4, justifyContent: "flex-end", marginTop: 10 }}><IconBtn icon={I_Pencil} onClick={() => setEdit(p)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(p.id)} title="Delete" color={T.red} /></div>
+      </Card>)}
+    </div>
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit pillar" : "Add pillar"} wide><PillarForm init={edit} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </>;
+}
+function PillarForm({ init, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <Field label="Name"><Input value={f.name} onChange={(e) => u("name", e.target.value)} /></Field>
+    <Field label="What it is"><Textarea value={f.what} onChange={(e) => u("what", e.target.value)} /></Field>
+    <Field label="Why it converts"><Textarea value={f.why} onChange={(e) => u("why", e.target.value)} /></Field>
+    <Field label="Color"><ColorPicker value={f.color} onChange={(v) => u("color", v)} /></Field>
+    <Field label="Icon"><IconPicker value={f.icon} onChange={(v) => u("icon", v)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.name && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+function IdeasTab({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const [fStatus, setFStatus] = useState("All");
+  const blank = { id: "", idea: "", pillar: "Teach", platform: "Both", format: "Tip reel", hook: "", status: "Idea", priority: "Med", notes: "" };
+  const save = (i) => { set((d) => i.id ? { ...d, ideas: d.ideas.map((x) => x.id === i.id ? i : x) } : { ...d, ideas: [{ ...i, id: uid() }, ...d.ideas] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, ideas: d.ideas.filter((x) => x.id !== id) }));
+  const statuses = ["All", "Idea", "Scripted", "Filmed", "Scheduled", "Posted"];
+  const list = fStatus === "All" ? s.ideas : s.ideas.filter((i) => i.status === fStatus);
+  const stC = { Idea: T.mut, Scripted: T.blue, Filmed: T.amber, Scheduled: T.purple, Posted: T.green };
+  const prC = { High: T.red, Med: T.amber, Low: T.mut };
+  return <>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14, gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{statuses.map((st) => <button key={st} onClick={() => setFStatus(st)} style={{ padding: "6px 12px", borderRadius: 9, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${fStatus === st ? T.A : T.line}`, background: fStatus === st ? T.aDim : "transparent", color: fStatus === st ? T.A : T.mut }}>{st}</button>)}</div>
+      <Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add idea</Btn>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(290px,1fr))", gap: 12 }}>
+      {list.map((i) => <Card key={i.id} style={{ padding: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8, gap: 6 }}>
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}><Badge c={T.blue} b="rgba(91,155,213,.16)">{i.pillar}</Badge><Badge c={prC[i.priority] || T.mut} b="rgba(255,255,255,.05)">{i.priority}</Badge></div>
+          <Badge c={stC[i.status] || T.mut} b="rgba(255,255,255,.06)">{i.status}</Badge>
+        </div>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: T.text, marginBottom: 6 }}>{i.idea}</div>
+        <div style={{ fontSize: 12, color: T.mut, fontStyle: "italic", lineHeight: 1.4, marginBottom: 8 }}>"{i.hook}"</div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{i.platform && <Chip label={i.platform} />}{i.format && <Chip label={i.format} />}</div>
+        {i.notes && <div style={{ fontSize: 11.5, color: T.mut, marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.line}` }}>{i.notes}</div>}
+        <div style={{ display: "flex", gap: 4, justifyContent: "flex-end", marginTop: 10 }}><IconBtn icon={I_Pencil} onClick={() => setEdit(i)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(i.id)} title="Delete" color={T.red} /></div>
+      </Card>)}
+    </div>
+    {list.length === 0 && <Empty icon={I_Lightbulb} text="No ideas in this view." />}
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit idea" : "Add idea"} wide><IdeaForm init={edit} pillars={s.pillars} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </>;
+}
+function IdeaForm({ init, pillars, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  const pillarOpts = pillars.map((p) => p.name).concat(["Teach", "Process", "Opinion", "Journey"]).filter((v, i, a) => a.indexOf(v) === i);
+  return <>
+    <Field label="Idea"><Input value={f.idea} onChange={(e) => u("idea", e.target.value)} /></Field>
+    <Field label="Hook line"><Input value={f.hook} onChange={(e) => u("hook", e.target.value)} /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Pillar"><Select value={f.pillar} onChange={(e) => u("pillar", e.target.value)} options={pillarOpts} /></Field>
+      <Field label="Platform"><Select value={f.platform} onChange={(e) => u("platform", e.target.value)} options={["Both", "Instagram", "YouTube", "TikTok"]} /></Field>
+      <Field label="Format"><Select value={f.format} onChange={(e) => u("format", e.target.value)} options={["Tip reel", "Face-to-cam", "Tutorial", "Vlog", "Before/after", "Skit"]} /></Field>
+      <Field label="Priority"><Select value={f.priority} onChange={(e) => u("priority", e.target.value)} options={["High", "Med", "Low"]} /></Field>
+      <Field label="Status"><Select value={f.status} onChange={(e) => u("status", e.target.value)} options={["Idea", "Scripted", "Filmed", "Scheduled", "Posted"]} /></Field>
+    </div>
+    <Field label="Notes"><Textarea value={f.notes} onChange={(e) => u("notes", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.idea && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+function PostLogTab({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", title: "", platform: "Instagram", pillar: "Teach", date: today(), views: "", followers: "" };
+  const save = (p) => { set((d) => p.id ? { ...d, posts: d.posts.map((x) => x.id === p.id ? p : x) } : { ...d, posts: [{ ...p, id: uid() }, ...d.posts] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, posts: d.posts.filter((x) => x.id !== id) }));
+  return <>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}><div style={{ fontSize: 12.5, color: T.mut }}>Log what you post to spot what actually works.</div><Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Log post</Btn></div>
+    <Card style={{ padding: 0 }}>
+      {s.posts.length === 0 ? <Empty icon={I_Clapperboard} text="No posts logged yet." /> : <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "Title", "Platform", "Pillar", "Views", "Follows", ""].map((h) => <th key={h} style={{ textAlign: ["Views", "Follows"].includes(h) ? "right" : "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
+          <tbody>{[...s.posts].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((p) => <tr key={p.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{p.date}</td><td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{p.title}</td>
+            <td style={{ padding: "11px 14px", color: T.mut }}>{p.platform}</td><td style={{ padding: "11px 14px", color: T.mut }}>{p.pillar}</td>
+            <td style={{ padding: "11px 14px", color: T.text, textAlign: "right" }}>{p.views ? ron(p.views) : "—"}</td>
+            <td style={{ padding: "11px 14px", color: T.green, textAlign: "right", fontWeight: 600 }}>{p.followers ? `+${ron(p.followers)}` : "—"}</td>
+            <td style={{ padding: "11px 14px", textAlign: "right" }}><IconBtn icon={I_Pencil} onClick={() => setEdit(p)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(p.id)} title="Delete" color={T.red} /></td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+    </Card>
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit post" : "Log post"}><PostForm init={edit} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </>;
+}
+function PostForm({ init, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <Field label="Title / topic"><Input value={f.title} onChange={(e) => u("title", e.target.value)} /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Platform"><Select value={f.platform} onChange={(e) => u("platform", e.target.value)} options={["Instagram", "YouTube", "TikTok"]} /></Field>
+      <Field label="Pillar"><Input value={f.pillar} onChange={(e) => u("pillar", e.target.value)} /></Field>
+      <Field label="Date"><Input type="date" value={f.date} onChange={(e) => u("date", e.target.value)} /></Field>
+      <Field label="Views"><Input type="number" value={f.views} onChange={(e) => u("views", e.target.value)} /></Field>
+    </div>
+    <Field label="Followers gained"><Input type="number" value={f.followers} onChange={(e) => u("followers", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.title && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+
+/* ---------------- Growth ---------------- */
+function Growth({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", date: today(), ig: "", yt: "", note: "" };
+  const save = (e) => { set((d) => e.id ? { ...d, social: d.social.map((x) => x.id === e.id ? e : x) } : { ...d, social: [...d.social, { ...e, id: uid() }] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, social: d.social.filter((x) => x.id !== id) }));
+  const sorted = [...s.social].sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+  const latest = sorted[sorted.length - 1] || { ig: 0, yt: 0 }; const first = sorted[0] || { ig: 0, yt: 0 };
+  const chart = sorted.map((x) => ({ name: (x.date || "").slice(5), IG: +x.ig || 0, YT: +x.yt || 0 }));
+  const igPct = Math.min(100, ((+latest.ig || 0) / (s.settings.igGoal || 1)) * 100);
+  const ytPct = Math.min(100, ((+latest.yt || 0) / (s.settings.ytGoal || 1)) * 100);
+  return <Section title="Growth" sub="Track the audience climb. Add a snapshot weekly — watch the line go up." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add snapshot</Btn>}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }} className="hq-grid2">
+      <Card style={{ padding: 20 }}><div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}><I_Instagram size={18} color="#E1306C" /><span style={{ fontSize: 13, fontWeight: 700, color: T.text }}>Instagram</span></div>
+        <div style={{ fontSize: 28, fontWeight: 700, color: T.text }}>{ron(latest.ig)}</div><div style={{ fontSize: 12, color: T.green, marginTop: 2 }}>+{ron((+latest.ig || 0) - (+first.ig || 0))} since start</div>
+        <div style={{ fontSize: 11, color: T.mut, marginTop: 12, marginBottom: 4 }}>Goal {ron(s.settings.igGoal)} ({igPct.toFixed(1)}%)</div><div style={{ height: 5, background: T.line, borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${igPct}%`, height: "100%", background: "#E1306C" }} /></div></Card>
+      <Card style={{ padding: 20 }}><div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}><I_Youtube size={18} color="#FF0000" /><span style={{ fontSize: 13, fontWeight: 700, color: T.text }}>YouTube</span></div>
+        <div style={{ fontSize: 28, fontWeight: 700, color: T.text }}>{ron(latest.yt)}</div><div style={{ fontSize: 12, color: T.green, marginTop: 2 }}>+{ron((+latest.yt || 0) - (+first.yt || 0))} since start</div>
+        <div style={{ fontSize: 11, color: T.mut, marginTop: 12, marginBottom: 4 }}>Goal {ron(s.settings.ytGoal)} ({ytPct.toFixed(1)}%)</div><div style={{ height: 5, background: T.line, borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${ytPct}%`, height: "100%", background: "#FF0000" }} /></div></Card>
+    </div>
+    <Card style={{ padding: 20, marginBottom: 18 }}><div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Follower growth</div><div style={{ height: 230 }}><SvgLines data={chart} series={[{ key: "IG", color: "#E1306C" }, { key: "YT", color: "#FF0000" }]} /></div></Card>
+    <Card style={{ padding: 0 }}><div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "Instagram", "YouTube", "Note", ""].map((h) => <th key={h} style={{ textAlign: "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
+        <tbody>{[...sorted].reverse().map((x) => <tr key={x.id} style={{ borderBottom: `1px solid ${T.line}` }}>
+          <td style={{ padding: "11px 14px", color: T.mut }}>{x.date}</td><td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{ron(x.ig)}</td>
+          <td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{ron(x.yt)}</td><td style={{ padding: "11px 14px", color: T.mut }}>{x.note}</td>
+          <td style={{ padding: "11px 14px", textAlign: "right" }}><IconBtn icon={I_Pencil} onClick={() => setEdit(x)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(x.id)} title="Delete" color={T.red} /></td>
+        </tr>)}</tbody>
+      </table>
+    </div></Card>
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit snapshot" : "Add snapshot"}><GrowthForm init={edit} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </Section>;
+}
+function GrowthForm({ init, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <Field label="Date"><Input type="date" value={f.date} onChange={(e) => u("date", e.target.value)} /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <Field label="Instagram followers"><Input type="number" value={f.ig} onChange={(e) => u("ig", e.target.value)} /></Field>
+      <Field label="YouTube subscribers"><Input type="number" value={f.yt} onChange={(e) => u("yt", e.target.value)} /></Field>
+    </div>
+    <Field label="Note (optional)"><Input value={f.note} onChange={(e) => u("note", e.target.value)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+
+/* ---------------- Goals (new) ---------------- */
+function Goals({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const blank = { id: "", name: "", icon: "target", current: 0, target: 100, unit: "", color: T.A, note: "" };
+  const save = (g) => { set((d) => g.id ? { ...d, goals: d.goals.map((x) => x.id === g.id ? g : x) } : { ...d, goals: [...d.goals, { ...g, id: uid() }] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, goals: d.goals.filter((x) => x.id !== id) }));
+  return <Section title="Goals" sub="Any target you want to track. Edit the current number as you progress." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add goal</Btn>}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 14 }}>
+      {s.goals.map((g) => { const pct = Math.min(100, ((+g.current || 0) / (+g.target || 1)) * 100); return <Card key={g.id} style={{ padding: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 36, height: 36, borderRadius: 11, background: g.color + "22", display: "grid", placeItems: "center" }}><Icon name={g.icon} size={18} color={g.color} /></div><div style={{ fontSize: 14.5, fontWeight: 700, color: T.text }}>{g.name}</div></div>
+          <div style={{ display: "flex", gap: 2 }}><IconBtn icon={I_Pencil} onClick={() => setEdit(g)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(g.id)} title="Delete" color={T.red} /></div>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 }}><span style={{ fontSize: 24, fontWeight: 700, color: T.text }}>{ron(g.current)}</span><span style={{ fontSize: 13, color: T.mut }}>/ {ron(g.target)} {g.unit}</span></div>
+        <div style={{ height: 7, background: T.line, borderRadius: 4, overflow: "hidden", marginBottom: 8 }}><div style={{ width: `${pct}%`, height: "100%", background: g.color, borderRadius: 4, transition: "width .3s" }} /></div>
+        <div style={{ fontSize: 11.5, color: T.mut }}>{pct.toFixed(1)}% · {g.note}</div>
+      </Card>; })}
+    </div>
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit goal" : "Add goal"} wide><GoalForm init={edit} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </Section>;
+}
+function GoalForm({ init, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <Field label="Goal name"><Input value={f.name} onChange={(e) => u("name", e.target.value)} /></Field>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+      <Field label="Current"><Input type="number" value={f.current} onChange={(e) => u("current", e.target.value)} /></Field>
+      <Field label="Target"><Input type="number" value={f.target} onChange={(e) => u("target", e.target.value)} /></Field>
+      <Field label="Unit"><Input value={f.unit} onChange={(e) => u("unit", e.target.value)} placeholder="RON, subs…" /></Field>
+    </div>
+    <Field label="Note"><Input value={f.note} onChange={(e) => u("note", e.target.value)} /></Field>
+    <Field label="Color"><ColorPicker value={f.color} onChange={(v) => u("color", v)} /></Field>
+    <Field label="Icon"><IconPicker value={f.icon} onChange={(v) => u("icon", v)} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.name && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+
+/* ---------------- Playbook (new) ---------------- */
+function Playbook({ s, set }) {
+  const [edit, setEdit] = useState(null);
+  const [fCat, setFCat] = useState("All");
+  const blank = { id: "", cat: "Outreach", title: "", body: "" };
+  const save = (t) => { set((d) => t.id ? { ...d, playbook: d.playbook.map((x) => x.id === t.id ? t : x) } : { ...d, playbook: [{ ...t, id: uid() }, ...d.playbook] }); setEdit(null); };
+  const del = (id) => set((d) => ({ ...d, playbook: d.playbook.filter((x) => x.id !== id) }));
+  const cats = ["All", ...s.playbookCats];
+  const list = fCat === "All" ? s.playbook : s.playbook.filter((t) => t.cat === fCat);
+  const copy = (txt) => { try { navigator.clipboard.writeText(txt); } catch (e) {} };
+  return <Section title="Playbook" sub="Your reusable scripts: outreach, pricing replies, qualifying questions. Copy, edit, add your own." right={<Btn onClick={() => setEdit(blank)}><I_Plus size={15} /> Add script</Btn>}>
+    <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>{cats.map((c) => <button key={c} onClick={() => setFCat(c)} style={{ padding: "7px 13px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${fCat === c ? T.A : T.line}`, background: fCat === c ? T.aDim : "transparent", color: fCat === c ? T.A : T.mut }}>{c}</button>)}</div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))", gap: 14 }}>
+      {list.map((t) => <Card key={t.id} style={{ padding: 18 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8, gap: 8 }}>
+          <div><Badge c={T.blue} b="rgba(91,155,213,.16)">{t.cat}</Badge><div style={{ fontSize: 14.5, fontWeight: 700, color: T.text, marginTop: 8 }}>{t.title}</div></div>
+          <div style={{ display: "flex", gap: 2 }}><IconBtn icon={I_Copy} onClick={() => copy(t.body)} title="Copy" /><IconBtn icon={I_Pencil} onClick={() => setEdit(t)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(t.id)} title="Delete" color={T.red} /></div>
+        </div>
+        <div style={{ fontSize: 12.5, color: T.mut, lineHeight: 1.6, whiteSpace: "pre-wrap", background: T.glass ? "rgba(255,255,255,.03)" : T.panel2, padding: 12, borderRadius: 12, border: `1px solid ${T.line}` }}>{t.body}</div>
+      </Card>)}
+    </div>
+    {list.length === 0 && <Empty icon={I_Book} text="No scripts in this view." />}
+    {edit && <Modal open onClose={() => setEdit(null)} title={edit.id ? "Edit script" : "Add script"} wide><PlaybookForm init={edit} cats={s.playbookCats} onSave={save} onClose={() => setEdit(null)} /></Modal>}
+  </Section>;
+}
+function PlaybookForm({ init, cats, onSave, onClose }) {
+  const [f, setF] = useState(init); const u = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  return <>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14 }}>
+      <Field label="Category"><Select value={f.cat} onChange={(e) => u("cat", e.target.value)} options={cats} /></Field>
+      <Field label="Title"><Input value={f.title} onChange={(e) => u("title", e.target.value)} /></Field>
+    </div>
+    <Field label="Script / message"><Textarea value={f.body} onChange={(e) => u("body", e.target.value)} style={{ minHeight: 160 }} /></Field>
+    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.title && onSave(f)}><I_Check size={15} /> Save</Btn></div>
+  </>;
+}
+
+/* ---------------- Skyscraper (now fully editable) ---------------- */
+function Skyscraper({ s, set }) {
+  const [open, setOpen] = useState(null);
+  const u = (id, patch) => set((d) => ({ ...d, layers: d.layers.map((l) => l.id === id ? { ...l, ...patch } : l) }));
+  const sorted = [...s.layers].sort((a, b) => b.n - a.n);
+  return <Section title="The Skyscraper" sub="Your long-term vision, one floor at a time. Click a floor to edit it.">
+    <Card glassStrength="thick" style={{ padding: 18, marginBottom: 16, borderColor: T.A + "44" }}>
+      <div style={{ fontSize: 13, color: T.text, lineHeight: 1.6 }}><b style={{ color: T.A }}>The strategy:</b> the craft (client work) funds the climb. The personal brand is the foundation everything else stacks on. Don't build floor 4 before floor 1 is solid. Right now: pour everything into Layer 1.</div>
+    </Card>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {sorted.map((l) => { const isOpen = open === l.id; return <Card key={l.id} style={{ padding: 0, borderColor: l.n === 1 ? T.A + "55" : T.line }}>
+        <div onClick={() => setOpen(isOpen ? null : l.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, cursor: "pointer" }}>
+          <div style={{ width: 44, height: 44, borderRadius: 13, background: l.n === 1 ? T.aDim : (T.glass ? "rgba(255,255,255,.05)" : T.panel2), border: `1px solid ${l.n === 1 ? T.A + "55" : T.line}`, display: "grid", placeItems: "center", flexShrink: 0 }}><span style={{ fontSize: 17, fontWeight: 800, color: l.n === 1 ? T.A : T.mut }}>{l.n}</span></div>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 15, fontWeight: 700, color: T.text }}>{l.name}</span>{l.n === 1 && <Badge c={T.A} b={T.aDim}>FOCUS NOW</Badge>}</div><div style={{ fontSize: 12, color: T.mut, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.desc}</div></div>
+          <div style={{ width: 84, flexShrink: 0 }}><div style={{ fontSize: 11, color: T.mut, textAlign: "right", marginBottom: 4 }}>{l.progress}%</div><div style={{ height: 5, background: T.line, borderRadius: 3, overflow: "hidden" }}><div style={{ width: `${l.progress}%`, height: "100%", background: l.progress > 0 ? T.green : T.line }} /></div></div>
+          <I_ChevronRight size={18} color={T.mut} style={{ transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .2s", flexShrink: 0 }} />
+        </div>
+        {isOpen && <div style={{ padding: "0 16px 16px 16px", borderTop: `1px solid ${T.line}`, paddingTop: 14 }}>
+          <Field label="Name"><Input value={l.name} onChange={(e) => u(l.id, { name: e.target.value })} /></Field>
+          <Field label="Description"><Textarea value={l.desc} onChange={(e) => u(l.id, { desc: e.target.value })} /></Field>
+          <Field label="Next action"><Input value={l.next} onChange={(e) => u(l.id, { next: e.target.value })} /></Field>
+          <Field label={`Progress: ${l.progress}%`}><input type="range" min="0" max="100" value={l.progress} onChange={(e) => u(l.id, { progress: +e.target.value })} style={{ width: "100%", accentColor: T.A }} /></Field>
+        </div>}
+      </Card>; })}
+    </div>
+  </Section>;
+}
+
+/* ---------------- Settings / Data ---------------- */
+function DataPage({ s, set, reset }) {
+  const fileRef = useRef();
+  const exp = () => { const blob = new Blob([JSON.stringify(s, null, 2)], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `business-hq-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); };
+  const imp = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = () => { try { set(() => migrate(JSON.parse(r.result), DEFAULT)); } catch { alert("That file couldn't be read as a valid backup."); } }; r.readAsText(file); };
+  const upS = (k, v) => set((d) => ({ ...d, settings: { ...d.settings, [k]: v } }));
+  const upNav = (i, k, v) => set((d) => ({ ...d, nav: d.nav.map((n, j) => j === i ? { ...n, [k]: v } : n) }));
+  const [navEdit, setNavEdit] = useState(null);
+  return <Section title="Settings" sub="Theme, goals, your menu, and a safety net for your data.">
+    <Card style={{ padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Appearance</div>
+      <Field label="Accent color"><ColorPicker value={s.settings.accent} onChange={(v) => upS("accent", v)} /></Field>
+      <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, cursor: "pointer" }}><input type="checkbox" checked={s.settings.glass !== false} onChange={(e) => upS("glass", e.target.checked)} /><span style={{ fontSize: 13, color: T.text }}>Liquid Glass theme (frosted, translucent). Uncheck for solid dark.</span></label>
+    </Card>
+    <Card style={{ padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Targets & currency</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 14 }}>
+        <Field label="Your name"><Input value={s.settings.name} onChange={(e) => upS("name", e.target.value)} /></Field>
+        <Field label="Currency label"><Input value={s.settings.currency} onChange={(e) => upS("currency", e.target.value)} /></Field>
+        <Field label="Monthly income goal"><Input type="number" value={s.settings.goalRON} onChange={(e) => upS("goalRON", +e.target.value)} /></Field>
+        <Field label="Instagram goal"><Input type="number" value={s.settings.igGoal} onChange={(e) => upS("igGoal", +e.target.value)} /></Field>
+        <Field label="YouTube goal"><Input type="number" value={s.settings.ytGoal} onChange={(e) => upS("ytGoal", +e.target.value)} /></Field>
+      </div>
+    </Card>
+    <Card style={{ padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 6 }}>Menu labels & icons</div>
+      <div style={{ fontSize: 12, color: T.mut, marginBottom: 14 }}>Rename any page or change its icon. (The page itself stays the same.)</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+        {s.nav.map((n, i) => <div key={n.key} style={{ display: "flex", alignItems: "center", gap: 8, background: T.glass ? "rgba(255,255,255,.03)" : T.panel2, padding: 8, borderRadius: 12, border: `1px solid ${T.line}` }}>
+          <button onClick={() => setNavEdit(navEdit === i ? null : i)} style={{ width: 34, height: 34, borderRadius: 9, background: T.aDim, border: "none", display: "grid", placeItems: "center", cursor: "pointer", flexShrink: 0 }}><Icon name={n.icon} size={16} color={T.A} /></button>
+          <Input value={n.label} onChange={(e) => upNav(i, "label", e.target.value)} />
+        </div>)}
+      </div>
+      {navEdit != null && <div style={{ marginTop: 12 }}><div style={{ fontSize: 11, color: T.mut, marginBottom: 6 }}>Pick an icon for "{s.nav[navEdit].label}"</div><IconPicker value={s.nav[navEdit].icon} onChange={(v) => { upNav(navEdit, "icon", v); }} /></div>}
+    </Card>
+    <Card style={{ padding: 20, marginBottom: 16 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 6 }}>Backup & restore</div>
+      <div style={{ fontSize: 12.5, color: T.mut, marginBottom: 14, lineHeight: 1.5 }}>Your data saves automatically on this computer. Export a backup now and then so you always own a copy. Updates keep your data automatically.</div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}><Btn onClick={exp}><I_Download size={15} /> Export backup</Btn><Btn variant="ghost" onClick={() => fileRef.current?.click()}><I_Upload size={15} /> Restore from file</Btn><input ref={fileRef} type="file" accept="application/json" onChange={imp} style={{ display: "none" }} /></div>
+    </Card>
+    <Card style={{ padding: 20, borderColor: T.red + "44" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.red, marginBottom: 6 }}>Reset</div>
+      <div style={{ fontSize: 12.5, color: T.mut, marginBottom: 14 }}>Wipes everything and restores the original seeded HQ. Export a backup first if you might want your data back.</div>
+      <Btn variant="danger" onClick={() => { if (confirm("Reset the entire HQ to defaults? This can't be undone.")) reset(); }}><I_RotateCcw size={15} /> Reset to defaults</Btn>
+    </Card>
+  </Section>;
+}
+
+/* ============================ SHELL ============================ */
+const PAGES = { dash: Dashboard, clients: Clients, pipeline: Pipeline, income: Income, expenses: Expenses, pricing: Pricing, content: Content, growth: Growth, goals: Goals, playbook: Playbook, sky: Skyscraper, data: DataPage };
+
+function App() {
+  const [state, setState] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [page, setPage] = useState("dash");
+  const [navOpen, setNavOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => { let alive = true; (async () => { try { const res = await store.get(KEY); if (alive) setState(res && res.value ? migrate(JSON.parse(res.value), DEFAULT) : JSON.parse(JSON.stringify(DEFAULT))); } catch { if (alive) setState(JSON.parse(JSON.stringify(DEFAULT))); } finally { if (alive) setLoaded(true); } })(); return () => { alive = false; }; }, []);
+  useEffect(() => { if (!loaded || state == null) return; const t = setTimeout(async () => { try { await store.set(KEY, JSON.stringify(state)); setSaved(true); setTimeout(() => setSaved(false), 1200); } catch {} }, 450); return () => clearTimeout(t); }, [state, loaded]);
+
+  const set = (fn) => setState((d) => fn(d));
+  const reset = () => { const fresh = JSON.parse(JSON.stringify(DEFAULT)); fresh.clients = fresh.clients.map((c) => ({ ...c, id: uid() })); setState(fresh); };
+
+  if (!loaded || !state) { T = makeTheme(DEFAULT.settings); return <div style={{ height: "100vh", background: T.bg, display: "grid", placeItems: "center", color: T.mut, fontFamily: "system-ui" }}><div style={{ textAlign: "center" }}><I_Building2 size={30} color={T.A} style={{ marginBottom: 10 }} /><div style={{ fontSize: 13 }}>Opening your HQ…</div></div></div>; }
+
+  T = makeTheme(state.settings);
+  const Page = PAGES[page] || Dashboard;
+  const cur = state.nav.find((n) => n.key === page) || { label: "", icon: "dashboard" };
+
+  return <div style={{ display: "flex", minHeight: "100vh", color: T.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif", position: "relative" }}>
+    {/* ambient background */}
+    <div style={{ position: "fixed", inset: 0, zIndex: -2, background: T.glass ? `radial-gradient(1100px 700px at 12% -8%, ${T.A}1A, transparent 60%), radial-gradient(900px 600px at 100% 0%, ${T.blue}14, transparent 55%), radial-gradient(800px 800px at 50% 120%, ${T.purple}12, transparent 60%), #080B12` : T.bg }} />
+    <style>{`
+      * { box-sizing: border-box; }
+      ::-webkit-scrollbar { width: 9px; height: 9px; }
+      ::-webkit-scrollbar-thumb { background: ${T.line}; border-radius: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      input[type=range]{ height: 5px; }
+      input::placeholder, textarea::placeholder { color: ${T.faint}; }
+      .hq-row:hover { background: ${T.glass ? "rgba(255,255,255,.04)" : T.panel2}; }
+      @media (min-width: 720px){ .hq-show-md { display: inline !important; } }
+      @media (max-width: 860px){ .hq-grid2 { grid-template-columns: 1fr !important; } .hq-sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 40; transform: translateX(-100%); transition: transform .25s; } .hq-sidebar.open { transform: translateX(0); } .hq-burger { display: inline-flex !important; } .hq-main { width: 100% !important; } }
+    `}</style>
+
+    <div className={`hq-sidebar ${navOpen ? "open" : ""}`} style={{ width: 244, flexShrink: 0, background: T.glass ? "rgba(12,16,26,0.6)" : "#0F1420", backdropFilter: T.blur, WebkitBackdropFilter: T.blur, borderRight: `1px solid ${T.line}`, display: "flex", flexDirection: "column", padding: "20px 12px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "4px 8px 20px" }}>
+        <div style={{ width: 36, height: 36, borderRadius: 11, background: `linear-gradient(135deg, ${T.A}, ${T.A}99)`, display: "grid", placeItems: "center", flexShrink: 0, boxShadow: T.glass ? `0 4px 14px ${T.A}55` : "none" }}><I_Building2 size={20} color="#171205" /></div>
+        <div style={{ lineHeight: 1.1 }}><div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, letterSpacing: -.2 }}>Business HQ</div><div style={{ fontSize: 10.5, color: T.mut }}>{state.settings.name}</div></div>
+      </div>
+      <nav style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, overflowY: "auto" }}>
+        {state.nav.map((n) => { const on = page === n.key; return <button key={n.key} onClick={() => { setPage(n.key); setNavOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 12px", borderRadius: 12, border: "none", cursor: "pointer", background: on ? T.aDim : "transparent", color: on ? T.A : T.mut, fontSize: 13.5, fontWeight: 600, textAlign: "left", fontFamily: "inherit", transition: "all .12s" }}><Icon name={n.icon} size={17} /> {n.label}</button>; })}
+      </nav>
+      <div style={{ padding: "12px 10px 2px", borderTop: `1px solid ${T.line}`, fontSize: 10.5, color: T.mut, lineHeight: 1.5 }}>Build the skyscraper — one floor at a time.</div>
+    </div>
+    {navOpen && <div onClick={() => setNavOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 35 }} />}
+
+    <div className="hq-main" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 22px", borderBottom: `1px solid ${T.line}`, background: T.glass ? "rgba(10,14,24,0.5)" : "rgba(15,20,32,.6)", position: "sticky", top: 0, zIndex: 20, backdropFilter: T.blur, WebkitBackdropFilter: T.blur }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button className="hq-burger" onClick={() => setNavOpen(true)} style={{ display: "none", background: "transparent", border: "none", color: T.text, cursor: "pointer" }}><I_Menu size={22} /></button>
+          <h1 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: T.text, letterSpacing: -.3, display: "flex", alignItems: "center", gap: 9 }}><Icon name={cur.icon} size={19} color={T.A} />{cur.label}</h1>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 11.5, color: saved ? T.green : T.mut, display: "flex", alignItems: "center", gap: 5, transition: "color .2s" }}>{saved ? <I_Check size={13} /> : <I_Wifi size={13} />}{saved ? "Saved" : "Live"}</span>
+          <span style={{ fontSize: 11.5, color: T.mut, padding: "5px 11px", border: `1px solid ${T.line}`, borderRadius: 20 }}>{new Date().toLocaleString("en-US", { month: "long", year: "numeric" })}</span>
+        </div>
+      </header>
+      <main style={{ padding: "26px 22px 70px", maxWidth: 1200, width: "100%", margin: "0 auto" }}>
+        <Page s={state} set={set} reset={reset} />
+      </main>
+    </div>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+
+  var b=document.getElementById('boot'); if(b) b.style.display='none';
+} catch(err){
+  var el=document.getElementById('err'); var bt=document.getElementById('boot');
+  if(bt) bt.style.display='none';
+  if(el){ el.style.display='block'; el.textContent='Something went wrong:\n\n'+(err.message||err)+'\n\n'+(err.stack||''); }
+}
+</script>
+</body>
+</html>

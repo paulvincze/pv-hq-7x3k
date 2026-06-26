@@ -345,7 +345,7 @@ const DEFAULT = {
     { id: uid(), idea: "What 16-yo me wishes he knew about editing", pillar: "Journey", platform: "Both", format: "Vlog", hook: "I wasted a year editing wrong.", status: "Idea", priority: "Low", notes: "" },
   ],
   posts: [
-    { id: uid(), title: "The 1888 museum — footage is guided, not seen", platform: "YouTube", pillar: "Teach the craft", date: today(), views: "", followers: "" },
+    { id: uid(), title: "The 1888 museum — footage is guided, not seen", platform: "YouTube", pillar: "Teach the craft", date: today(), views: "", followers: "", format: "Cinematic talking-head", target: "Experienced creators (1–2 years in)", goal: "Reach + saves", status: "Filming tonight", notes: "In 1888, a museum in Paris hung two paintings side by side. Same size, same subject, painted by the same man, in the same week. One of them, people stood in front of for twenty minutes. The other, they walked past in seconds. The difference wasn't the skill. It wasn't the subject. It was that one of them had somewhere for your eye to go, and the other didn't. Most footage is the second painting. Technically right. Correctly exposed, sharp, clean. And the eye slides right off it, because nothing in the frame decided where you were supposed to look. The painter who held the room knew something the other one didn't. That a frame isn't everything you can fit in it. It's everything you choose to leave. Where the light falls, what stays in shadow, what you let the eye ignore. He wasn't filling the canvas. He was aiming it. That's the part nobody tells you after your first two years. You already know how to make a sharp, clean frame. The thing you're missing isn't quality. It's that you're still filling the frame instead of aiming it. Footage doesn't hold people because it looks good. It holds them because you decided where they were allowed to look." },
   ],
   social: [{ id: uid(), date: today(), ig: 481, yt: 767, note: "Baseline — day we built HQ" }],
   goals: [
@@ -376,6 +376,7 @@ const DEFAULT = {
     { id: uid(), text: "Qualify new barber (scope, deadline, budget)", done: false, p: 2 },
     { id: uid(), text: "Ship 1 YouTube tutorial this week", done: false, p: 3 },
     { id: uid(), text: "Post daily short-form (new direction)", done: false, p: 3 },
+    { id: uid(), text: "Deliver free sample edits same-day", done: false, p: 3 },
   ],
 };
 
@@ -990,7 +991,7 @@ function IdeaForm({ init, pillars, onSave, onClose }) {
 }
 function PostLogTab({ s, set }) {
   const [edit, setEdit] = useState(null);
-  const blank = { id: "", title: "", platform: "Instagram", pillar: "Teach", date: today(), views: "", followers: "" };
+  const blank = { id: "", title: "", platform: "Instagram", pillar: "Teach", date: today(), views: "", followers: "", format: "", target: "", goal: "", status: "", notes: "" };
   const save = (p) => { set((d) => p.id ? { ...d, posts: d.posts.map((x) => x.id === p.id ? p : x) } : { ...d, posts: [{ ...p, id: uid() }, ...d.posts] }); setEdit(null); };
   const del = (id) => set((d) => ({ ...d, posts: d.posts.filter((x) => x.id !== id) }));
   return <>
@@ -998,10 +999,11 @@ function PostLogTab({ s, set }) {
     <Card style={{ padding: 0 }}>
       {s.posts.length === 0 ? <Empty icon={I_Clapperboard} text="No posts logged yet." /> : <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-          <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "Title", "Platform", "Pillar", "Views", "Follows", ""].map((h) => <th key={h} style={{ textAlign: ["Views", "Follows"].includes(h) ? "right" : "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
+          <thead><tr style={{ background: T.glass ? "rgba(255,255,255,.03)" : T.panel2 }}>{["Date", "Title", "Platform", "Pillar", "Status", "Views", "Follows", ""].map((h) => <th key={h} style={{ textAlign: ["Views", "Follows"].includes(h) ? "right" : "left", padding: "12px 14px", color: T.mut, fontSize: 11, fontWeight: 700, borderBottom: `1px solid ${T.line}` }}>{h}</th>)}</tr></thead>
           <tbody>{[...s.posts].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((p) => <tr key={p.id} style={{ borderBottom: `1px solid ${T.line}` }}>
             <td style={{ padding: "11px 14px", color: T.mut }}>{p.date}</td><td style={{ padding: "11px 14px", color: T.text, fontWeight: 600 }}>{p.title}</td>
             <td style={{ padding: "11px 14px", color: T.mut }}>{p.platform}</td><td style={{ padding: "11px 14px", color: T.mut }}>{p.pillar}</td>
+            <td style={{ padding: "11px 14px" }}>{p.status ? <Badge c={p.status === "Posted" ? T.green : T.amber} b={p.status === "Posted" ? T.greenDim : T.amberDim}>{p.status}</Badge> : <span style={{ color: T.faint }}>—</span>}</td>
             <td style={{ padding: "11px 14px", color: T.text, textAlign: "right" }}>{p.views ? ron(p.views) : "—"}</td>
             <td style={{ padding: "11px 14px", color: T.green, textAlign: "right", fontWeight: 600 }}>{p.followers ? `+${ron(p.followers)}` : "—"}</td>
             <td style={{ padding: "11px 14px", textAlign: "right" }}><IconBtn icon={I_Pencil} onClick={() => setEdit(p)} title="Edit" /><IconBtn icon={I_Trash2} onClick={() => del(p.id)} title="Delete" color={T.red} /></td>
@@ -1019,10 +1021,15 @@ function PostForm({ init, onSave, onClose }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
       <Field label="Platform"><Select value={f.platform} onChange={(e) => u("platform", e.target.value)} options={["Instagram", "YouTube", "TikTok"]} /></Field>
       <Field label="Pillar"><Input value={f.pillar} onChange={(e) => u("pillar", e.target.value)} /></Field>
+      <Field label="Format"><Input value={f.format||""} onChange={(e) => u("format", e.target.value)} placeholder="e.g. Cinematic talking-head" /></Field>
+      <Field label="Target audience"><Input value={f.target||""} onChange={(e) => u("target", e.target.value)} placeholder="e.g. Experienced creators" /></Field>
+      <Field label="Goal"><Input value={f.goal||""} onChange={(e) => u("goal", e.target.value)} placeholder="e.g. Reach + saves" /></Field>
+      <Field label="Status"><Input value={f.status||""} onChange={(e) => u("status", e.target.value)} placeholder="e.g. Filming tonight" /></Field>
       <Field label="Date"><Input type="date" value={f.date} onChange={(e) => u("date", e.target.value)} /></Field>
       <Field label="Views"><Input type="number" value={f.views} onChange={(e) => u("views", e.target.value)} /></Field>
     </div>
     <Field label="Followers gained"><Input type="number" value={f.followers} onChange={(e) => u("followers", e.target.value)} /></Field>
+    <Field label="Script / notes"><Textarea value={f.notes||""} onChange={(e) => u("notes", e.target.value)} style={{ minHeight: 160 }} /></Field>
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn onClick={() => f.title && onSave(f)}><I_Check size={15} /> Save</Btn></div>
   </>;
 }
